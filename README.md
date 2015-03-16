@@ -3,6 +3,8 @@ damage-assessment-summary
 
 The Damage Assessment Summary Add-in extends the Operations Dashboard for ArcGIS application and allows you to generate a damage summary
 
+![Image of Damage Assessment Summary Add-in](damage-assessment-summary.png "Damage Assessment Summary")](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment)
+
 ## Features
 
 * Review damage assessment features and attributes
@@ -13,8 +15,6 @@ The Damage Assessment Summary Add-in extends the Operations Dashboard for ArcGIS
 [Download](http://links.esri.com/emergencymanagement/download/DamageAssessment)
 
 [Help](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment).
-
-### Esri Sample Services
 
 ### General Help
 [New to Github? Get started here.](http://htmlpreview.github.com/?https://github.com/Esri/esri.github.com/blob/master/help/esri-getting-to-know-github.html)
