@@ -21,7 +21,7 @@ Alternatively, build the project, and upload the .opdashboardaddin file from the
 
 ## Resources
 
-Learn more about Esri's [Emergency Management Solutions]("http://solutions.arcgis.com/local-government/"ArcGIS for Local Government maps and apps)
+Learn more about Esri's [Emergency Management Solutions](http://solutions.arcgis.com/local-government/"ArcGIS for Local Government maps and apps)
 
 Show me a list of other [State Government GitHub repositories](http://esri.github.io/#State-Government).
 
