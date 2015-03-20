@@ -3,7 +3,7 @@ damage-assessment-summary
 
 The Damage Assessment Summary Add-in extends the Operations Dashboard for ArcGIS application and allows you to generate a damage summary
 
-![Image of Damage Assessment Summary Add-in](damage-assessment-summary.png "Damage Assessment Summary")](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment)
+[![Image of Damage Assessment Summary Add-in](damage-assessment-summary.png "Damage Assessment Summary")](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment)
 
 ## Features
 
@@ -42,7 +42,7 @@ Please see our [guidelines for contributing](https://github.com/esri/contributin
 
 ## Licensing
 
-Copyright 2013 Esri
+Copyright 2015 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 A copy of the license is available in the repository's
-[LICENSE.txt](https://raw.github.com/ArcGIS/damage-assessment-summary/master/LICENSE.txt) file.
+[LICENSE.txt](LICENSE.txt) file.
 
-[](Esri Tags: State-Government Emergency-Management Damage Assessment Summary)
+[](Esri Tags: ArcGISSolutions State-Government Local-Government Emergency-Management Damage Assessment Summary)
 [](Esri Language: C#)
