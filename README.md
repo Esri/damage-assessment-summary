@@ -10,22 +10,27 @@ The Damage Assessment Summary Add-in extends the Operations Dashboard for ArcGIS
 * Review damage assessment features and attributes
 * Generate summary report
 
-## Instructions
-
-[Download](http://links.esri.com/emergencymanagement/download/DamageAssessment)
-
-[Help](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment).
-
 ### General Help
 [New to Github? Get started here.](http://htmlpreview.github.com/?https://github.com/Esri/esri.github.com/blob/master/help/esri-getting-to-know-github.html)
 
 ## Requirements
 
+Start using the tool now by opening and compiling the project in Visual Studio 2012 or 2013. Update Project Debug properties to correctly locate add-in build path in /addinpath command line argument. Run project in Debug mode. When Operations Dashboard application starts, edit an operation view that contains a map widget with a valid datasource, choose the DamageAssessmentSummary Widget from the Add Widget dialog box, and click OK. Configure the widget to point to appropriate fields from the datasource and click OK.
+
+Alternatively, build the project, and upload the .opdashboardaddin file from the build output directory to ArcGIS Online, and then download using Manage Add-Ins in Operations Dashboard.
+
 ## Resources
+
+Learn more about Esri's [Emergency Management Solutions]("http://solutions.arcgis.com/local-government/"ArcGIS for Local Government maps and apps)
 
 Show me a list of other [State Government GitHub repositories](http://esri.github.io/#State-Government).
 
 Show me a list of other [Emergency Management GitHub repositories](http://esri.github.io/#Emergency-Management).
+
+Additional [information and sample data](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment)
+are available for the application.
+
+Learn more about Esri's [Operations Dashboard for ArcGIS](http://www.esri.com/software/arcgis/arcgisonline/features/operations-dashboard).
 
 This application uses the 10.2.5 version of
 [Esri's ArcGIS Runtime SDK for WPF](http://resources.arcgis.com/en/communities/runtime-wpf/);
