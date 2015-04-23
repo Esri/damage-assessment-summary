@@ -72,12 +72,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoolConverter.cs" />
+    <Compile Include="ClickableTextBox.cs" />
     <Compile Include="Config\DamageAssessmentSummaryResultViewDialog.xaml.cs">
       <DependentUpon>DamageAssessmentSummaryResultViewDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CountConverter.cs" />
     <Compile Include="DamageAssessmentSummaryResultView.xaml.cs">
       <DependentUpon>DamageAssessmentSummaryResultView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DraggableListView.cs" />
+    <Compile Include="Expression.cs" />
+    <Compile Include="MouseUtilities.cs" />
+    <Compile Include="NewField.cs" />
+    <Compile Include="Operators.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -91,6 +99,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="SiteDetails.cs" />
+    <Compile Include="StringItems.cs" />
+    <Compile Include="StringItems2.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

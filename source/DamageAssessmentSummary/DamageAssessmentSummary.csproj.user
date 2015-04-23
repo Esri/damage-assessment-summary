@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files %28x86%29\ArcGIS SDKs\WPF10.2.3\SDK\OperationsDashboard\OperationsDashboard.exe</StartProgram>
-    <StartArguments>/addinpath:"D:\Solutions\DamageAssesment\Summarize\DamageAssessmentSummary\DamageAssessmentSummary\bin\Debug"</StartArguments>
+    <StartArguments>/addinpath:"C:\Users\john4818\Documents\GitHub\damage-assessment-summary\source\DamageAssessmentSummary\bin\Debug"</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartAction>Program</StartAction>

@@ -26,7 +26,7 @@ namespace DamageAssessmentSummary
     /// data source is updated or removed.
     /// </summary>
     [Export("ESRI.ArcGIS.OperationsDashboard.Widget")]
-    [ExportMetadata("DisplayName", "Damage Assessment Summary")]
+    [ExportMetadata("DisplayName", "Summary Report Tool")]
     [ExportMetadata("Description", "Select key fields from a feature service and export to CSV")]
     [ExportMetadata("ImagePath", "/DamageAssessmentSummary;component/Images/Widget32.png")]
     [ExportMetadata("DataSourceRequired", true)]
@@ -42,23 +42,9 @@ namespace DamageAssessmentSummary
         [DataMember(Name = "mapWidget")]
         private MapWidget mapWidget = null;
 
-        [DataMember(Name = "parcelIDFieldName")]
-        private string ParcelIDFieldName { get; set; }
-
-        [DataMember(Name = "addressFieldName")]
-        private string AddressFieldName { get; set; }
-
-        [DataMember(Name = "incidentNameFieldName")]
-        private string IncidentNameFieldName { get; set; }
-
-        [DataMember(Name = "descriptionOfDamageFieldName")]
-        private string DescriptionOfDamageFieldName { get; set; }
-
-        [DataMember(Name = "currentAssessedValueFieldName")]
-        private string CurrentAssessedValueFieldName { get; set; }
-
+        //{ Key=FieldName, Value=AliasOrUserName }
         [DataMember(Name = "additionalFields")]
-        private IList<string> AdditionalFields { get; set; }
+        private Dictionary<string, string> AdditionalFields { get; set; }
 
         public DamageAssessmentSummaryResultView()
         {
@@ -73,7 +59,8 @@ namespace DamageAssessmentSummary
 
         #region IWidget Members
 
-        private string _caption = "Damage Summary";
+        private string _caption = "Summary Report";
+
         /// <summary>
         /// The text that is displayed in the widget's containing window title bar. This property is set during widget configuration.
         /// </summary>
@@ -141,31 +128,22 @@ namespace DamageAssessmentSummary
         public bool Configure(Window owner, IList<DataSource> dataSources)
         {
             // Show the configuration dialog.
-            Config.DamageAssessmentSummaryResultViewDialog dialog = new Config.DamageAssessmentSummaryResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId) { Owner = owner };
+            Config.DamageAssessmentSummaryResultViewDialog dialog = new Config.DamageAssessmentSummaryResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, null) { Owner = owner };
             if (dialog.ShowDialog() != true)
                 return false;
 
             // Retrieve the selected values for the properties from the configuration dialog.
             Caption = dialog.Caption;
             DataSourceId = dialog.DataSource.Id;
-            ParcelIDFieldName = dialog.ParcelIDField.Name;
-            AddressFieldName = dialog.AddressField.Name;
-            IncidentNameFieldName = dialog.IncidentNameField.Name;
-            DescriptionOfDamageFieldName = dialog.DescriptionOfDamageField.Name;
-            CurrentAssessedValueFieldName = dialog.CurrentAssessedValueField.Name;
 
             mapWidget = dialog.mapWidget;
 
-            AdditionalFields = new List<string>(){
-                AddressFieldName,
-                ParcelIDFieldName,
-                IncidentNameFieldName,
-                DescriptionOfDamageFieldName,
-                CurrentAssessedValueFieldName
-            };
+            AdditionalFields = new Dictionary<string,string>(){};
 
             foreach (var item in dialog.AdditionalFieldNames)
-                AdditionalFields.Add(item);
+            {
+                AdditionalFields.Add(item.Key,item.Value);
+            }
 
             //get the datasource based on ID
             dataSource = OperationsDashboard.Instance.DataSources.FirstOrDefault((_dataSource) => _dataSource.Id == DataSourceId);
@@ -259,17 +237,6 @@ namespace DamageAssessmentSummary
         /// </summary>
         private async void getData(DataSource ds)
         {
-            //Find the Geometry field name
-            string geomFieldName = "";
-            for (int i = 0; i < ds.Fields.Count; i++)
-            {
-                if (ds.Fields[i].Type == client.Field.FieldType.Geometry)
-                {
-                    geomFieldName = dataSource.Fields[i].FieldName;
-                    break;
-                }
-            }
-
             //query/return all features
             var result = await ds.ExecuteQueryAsync(new Query("1=1", null, true));
 
@@ -288,7 +255,7 @@ namespace DamageAssessmentSummary
                         {
                             ZoomExtent = item.Geometry,
                             AdditionalFieldsAndValues = createNewFieldList(item),
-                            LabelField = (item.Attributes[AdditionalFields[0]] != null) ? item.Attributes[AdditionalFields[0]].ToString() : ""
+                            LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : ""
                         });
                     }
                     catch (Exception ex)
@@ -313,10 +280,10 @@ namespace DamageAssessmentSummary
             {
                 try
                 {
-                    if (item.Attributes[fieldName] != null)
-                        fieldList.Add(new StringItems(fieldName + ":", item.Attributes[fieldName].ToString()));
+                    if (item.Attributes[fieldName.Key] != null)
+                        fieldList.Add(new StringItems(fieldName.Value + ":", item.Attributes[fieldName.Key].ToString()));
                     else
-                        fieldList.Add(new StringItems(fieldName + ":", ""));
+                        fieldList.Add(new StringItems(fieldName.Value + ":", ""));
                 }
                 catch (Exception ex)
                 {
@@ -367,7 +334,7 @@ namespace DamageAssessmentSummary
 
                 string fs = createFormatString(AdditionalFields);
 
-                IList<string> t = AdditionalFields.ToList();
+                IList<string> t = AdditionalFields.Values.ToList();
                 t.Add(Environment.NewLine);
                 var headerLine = string.Format(fs, t.ToArray());
                 sb.Append(headerLine);
@@ -405,7 +372,7 @@ namespace DamageAssessmentSummary
         /// <summary>
         /// Construct format string to join with the features values 
         /// </summary>
-        private string createFormatString(IList<string> d)
+        private string createFormatString(IDictionary<string,string> d)
         {
             string s = "";
 
@@ -426,7 +393,7 @@ namespace DamageAssessmentSummary
             {
                 for (int ii = 0; ii < si.Count; ii++)
                 {
-                    if (AdditionalFields[i] == si[ii].key.TrimEnd(':'))
+                    if (AdditionalFields.Values.ToList()[i] == si[ii].key.TrimEnd(':'))
                     {
                         valList.Add(si[ii].value);
                         break;
@@ -441,31 +408,4 @@ namespace DamageAssessmentSummary
 
         #endregion
     }
-
-    /// <summary>
-    /// store the key value pair...using this instead of the out of the box KeyValuePair class 
-    /// as this will allow for 2 way binding
-    /// </summary>
-    public class StringItems
-    {
-        public StringItems(string Key, string Value)
-        {
-            key = Key;
-            value = Value;
-        }
-
-        public string key { get; set; }
-        public string value { get; set; }
-    }
-
-    /// <summary>
-    /// class used to store the values from the features that are passed to the list
-    /// </summary>
-    public class SiteDetails
-    {
-        public string LabelField { get; set; }
-        public ESRI.ArcGIS.Client.Geometry.Geometry ZoomExtent { get; set; }
-        public IList<StringItems> AdditionalFieldsAndValues { get; set; }
-    }
-
 }

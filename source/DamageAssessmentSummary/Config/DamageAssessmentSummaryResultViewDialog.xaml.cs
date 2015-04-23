@@ -11,6 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Collections;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace DamageAssessmentSummary.Config
 {
@@ -19,23 +22,22 @@ namespace DamageAssessmentSummary.Config
     /// </summary>
     public partial class DamageAssessmentSummaryResultViewDialog : Window
     {
-
         public DataSource DataSource { get; private set; }
 
-        public client.Field ParcelIDField { get; private set; }
-        public client.Field AddressField { get; private set; }
-        public client.Field IncidentNameField { get; private set; }
-        public client.Field DescriptionOfDamageField { get; private set; }
-        public client.Field CurrentAssessedValueField { get; private set; }
+        public IDictionary<string,string> AdditionalFieldNames { get; private set; }
 
-        public IList<string> AdditionalFieldNames { get; private set; }
+        //TODO...update this as values are modified for the user controled txt box
+        //private IDictionary<string, IList<string>> FieldNameAliasMap { get; set; }
+        private ObservableCollection<StringItems2> FieldNameAliasMap { get; set; }
 
         public string Caption { get; private set; }
         public MapWidget mapWidget { get; private set; }
 
+        private ObservableCollection<StringItems2> expressions;
+
         private enum fieldTypes { ParcelID, Address, IncidentName, DescriptionOfDamage, CurrentAssessedValue };
 
-        public DamageAssessmentSummaryResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId)
+        public DamageAssessmentSummaryResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, IEnumerable s)
         {
             InitializeComponent();
 
@@ -68,7 +70,19 @@ namespace DamageAssessmentSummary.Config
                     mapWidget = currentWidget;
             }
 
-            populateNewFieldList();
+            if (s != null)
+            {
+                rePopulateFieldList(s);
+            }
+            else
+            {
+                populateNewFieldList();
+            }
+        }
+
+        private void rePopulateFieldList(IEnumerable s)
+        {
+            chkBoxListView.ItemsSource = s;
         }
 
         /// <summary>
@@ -76,13 +90,32 @@ namespace DamageAssessmentSummary.Config
         /// </summary>
         private void populateFieldList(DataSource ds)
         {
-            IList<string> fieldNames = new List<string>();
+            ////FieldNameAliasMap = new Dictionary<string, IList<string>>();
+
+            //foreach (var field in ds.Fields)
+            //    FieldNameAliasMap.Add(field.Name, new List<string>() { field.Alias, field.Alias });
+
+            //chkBoxListView.ItemsSource = FieldNameAliasMap;
+
+            FieldNameAliasMap = new ObservableCollection<StringItems2>();
+
             foreach (var field in ds.Fields)
             {
-                fieldNames.Add(field.Name);
+                StringItems2 si2 = new StringItems2(field.Name, new List<string>() { field.Alias, field.Alias });
+                FieldNameAliasMap.Add(si2);
             }
 
-            chkBoxListView.ItemsSource = fieldNames;
+            chkBoxListView.ItemsSource = FieldNameAliasMap;
+
+            //IList<StringItems2> fieldNames = FieldNameAliasMap
+            //    .Cast<StringItems2>().Where(item => item.isChecked == true).ToList();
+            var fieldNames = from p in FieldNameAliasMap select p.key;
+
+            cboFieldNames.ItemsSource = fieldNames;
+
+            Operators operators = new Operators();
+
+            cboOperators.ItemsSource = operators.operatorStrings;
         }
 
         /// <summary>
@@ -102,18 +135,15 @@ namespace DamageAssessmentSummary.Config
             DataSource = DataSourceSelector.SelectedDataSource;
             Caption = CaptionTextBox.Text;
 
-            ParcelIDField = (client.Field)ParcelIDFieldComboBox.SelectedItem;
-            AddressField = (client.Field)AddressFieldComboBox.SelectedItem;
-            IncidentNameField = (client.Field)IncidentNameFieldComboBox.SelectedItem;
-            DescriptionOfDamageField = (client.Field)DescriptionOfDamageFieldComboBox.SelectedItem;
-            CurrentAssessedValueField = (client.Field)CurrentAssessedValueFieldComboBox.SelectedItem;
+            IList<StringItems2> displayItems = chkBoxListView.Items
+                    .Cast<StringItems2>().Where(item => item.isChecked == true).ToList();
 
-            AdditionalFieldNames = ConvertToListOf<string>(chkBoxListView.SelectedItems);
+            AdditionalFieldNames = ConvertToDictionary(displayItems);
 
             foreach (NewField item in lvNewFields.Items)
             {
                 if (item.Name != "New Field Name")
-                    AdditionalFieldNames.Add(item.Name);
+                    AdditionalFieldNames.Add(item.Name, item.Name);
             }
 
             DialogResult = true;
@@ -122,12 +152,24 @@ namespace DamageAssessmentSummary.Config
         /// <summary>
         /// List Type conversion utility
         /// </summary>
-        private IList<T> ConvertToListOf<T>(IList iList)
+        private IDictionary<string, string> ConvertToDictionary(IList<StringItems2> iList)
         {
-            IList<T> result = new List<T>();
+            IDictionary<string, string> result = new Dictionary<string,string>();
 
-            foreach (T value in iList)
-                result.Add(value);
+            foreach (StringItems2 value in iList)
+            {
+                foreach (StringItems2 item in FieldNameAliasMap)
+                {
+                    if (item.key == value.key)
+                    {
+                        if(item.displayAliasValue)
+                            result.Add(item.key, item.value[1]);
+                        if (item.displayNameValue)
+                            result.Add(item.key, item.key);
+                        break;
+                    }
+                }
+            }
 
             return result;
         }
@@ -139,25 +181,9 @@ namespace DamageAssessmentSummary.Config
         {
             DataSource dataSource = DataSourceSelector.SelectedDataSource;
 
-            IList<ESRI.ArcGIS.Client.Field> fields = dataSource.Fields;
+            //IList<ESRI.ArcGIS.Client.Field> fields = dataSource.Fields;
 
             //list all fields from the datasource
-            ParcelIDFieldComboBox.ItemsSource = fields;
-            //automatically select the field if it matches the pre-configured source field names
-            ParcelIDFieldComboBox.SelectedItem = fields[getDefaultFieldIndex(fieldTypes.ParcelID, fields)];
-
-            AddressFieldComboBox.ItemsSource = fields;
-            AddressFieldComboBox.SelectedItem = fields[getDefaultFieldIndex(fieldTypes.Address, fields)];
-
-            IncidentNameFieldComboBox.ItemsSource = fields;
-            IncidentNameFieldComboBox.SelectedItem = fields[getDefaultFieldIndex(fieldTypes.IncidentName, fields)];
-
-            DescriptionOfDamageFieldComboBox.ItemsSource = fields;
-            DescriptionOfDamageFieldComboBox.SelectedItem = fields[getDefaultFieldIndex(fieldTypes.DescriptionOfDamage, fields)];
-
-            CurrentAssessedValueFieldComboBox.ItemsSource = fields;
-            CurrentAssessedValueFieldComboBox.SelectedItem = fields[getDefaultFieldIndex(fieldTypes.CurrentAssessedValue, fields)];
-
             populateFieldList(dataSource);
         
         }
@@ -174,143 +200,214 @@ namespace DamageAssessmentSummary.Config
             OKButton.IsEnabled = true;
         }
 
-        /// <summary>
-        /// this method attempts to find the default field for the type of info we are after
-        /// </summary>
-        private int getDefaultFieldIndex(fieldTypes fieldType, IList<client.Field> fields)
-        {
-            string defaultName = "";
-
-            switch (fieldType)
-            {
-                case fieldTypes.ParcelID:
-                    defaultName = "PARCELID";
-                    break;
-                case fieldTypes.Address:
-                    defaultName = "FULLADDR";
-                    break;
-                case fieldTypes.IncidentName:
-                    defaultName = "INCIDENTNM";
-                    break;
-                case fieldTypes.DescriptionOfDamage:
-                    defaultName = "DESCDAMAGE";
-                    break;
-                case fieldTypes.CurrentAssessedValue:
-                    defaultName = "PREDISVAL";
-                    break;
-            }
-
-            for (int i = 0; i < fields.Count; i++)
-            {
-                if (fields[i].Name == defaultName)
-                {
-                    return i;
-                }
-            }
-
-            //return 0...(the first field) if default field not found in the fields collection
-            return 0;
-        }
-
         private void chkBoxListView_Unchecked(object sender, RoutedEventArgs e)
         {
             chkBoxSelectAll.IsChecked = false;
-        }
-
-        private void chkBoxSelectAll_Click(object sender, RoutedEventArgs e)
-        {
-            if (chkBoxSelectAll.IsChecked.HasValue && chkBoxSelectAll.IsChecked.Value)
-                chkBoxListView.SelectAll();
-            else
-                chkBoxListView.UnselectAll();
         }
 
         private void removeField_Checked(object sender, RoutedEventArgs e)
         {
             lvNewFields.Items.RemoveAt(lvNewFields.SelectedIndex);
         }
-    }
 
-    public class NewField
-    {
-        private string _name;
+        //private void modifyField_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    TextBox tb = (TextBox)((StackPanel)((CheckBox)sender).Parent).Children[0];
+        //    tb.IsEnabled = true;
+        //}
 
-        public NewField(string name)
+        //private void chkBox_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    //enable the ability to modify
+        //    object o = ((CheckBox)sender).Parent;
+
+        //    //need to handle cleaner...hack for now because it's quick
+        //    CheckBox cb = (CheckBox)((StackPanel)((StackPanel)o).Children[1]).Children[1];
+        //    cb.IsEnabled = true;
+        //}
+
+        //private void chkBox_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    //enable the ability to modify
+        //    object o = ((CheckBox)sender).Parent;
+
+        //    //need to handle cleaner...hack for now because it's quick
+        //    CheckBox cb = (CheckBox)((StackPanel)((StackPanel)o).Children[1]).Children[1];
+        //    cb.IsEnabled = false;
+        //}
+
+        //private void modifyField_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    TextBox tb = (TextBox)((StackPanel)((CheckBox)sender).Parent).Children[0];
+        //    tb.IsEnabled = false;
+        //}
+
+        private void fieldName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Name = name;
+            //string org = e.OriginalSource.ToString();
+          
+            //string n = ((CheckBox)((StackPanel)((StackPanel)((TextBox)sender).Parent).Parent).Children[0]).Content.ToString();
+
+            //updateAdditionalFields(n, ((ClickSelectTextBox)sender).Text);
+            
+            //System.Diagnostics.Debug.WriteLine(n);
         }
-        public string Name 
+
+        private void updateAdditionalFields(string n, string s)
         {
-            get { return _name;}
-            set 
-            { 
-                _name = value;
-            }
-        }
-    }
-
-    /// <summary>
-    /// this enables serveral features for a standard TextBox...used for New Fields
-    /// </summary>
-    public class ClickSelectTextBox : TextBox
-    {
-        public ClickSelectTextBox()
-        {
-            AddHandler(PreviewMouseLeftButtonDownEvent,
-              new MouseButtonEventHandler(SelectivelyIgnoreMouseButton), true);
-            AddHandler(GotKeyboardFocusEvent,
-              new RoutedEventHandler(SelectAllText), true);
-            AddHandler(MouseDoubleClickEvent,
-              new RoutedEventHandler(SelectAllText), true);
-            AddHandler(TextChangedEvent,
-              new TextChangedEventHandler(MyTextChanged), true);
-        }
-
-        private static void MyTextChanged(object sender, TextChangedEventArgs e)
-        {
-            DependencyObject child = e.OriginalSource as UIElement;
-            DependencyObject parent = e.OriginalSource as UIElement;
-
-            while (parent != null && !(parent is ListView))
-                parent = VisualTreeHelper.GetParent(parent);
-
-            if (parent != null)
+            foreach (StringItems2 item in FieldNameAliasMap)
             {
-                var lv = (ListView)parent;
-
-                if (lv.SelectedIndex == lv.Items.Count - 1)
+                if (item.value[0] == n)
                 {
-                    NewField nf = new NewField("New Field Name");
-                    lv.Items.Add(nf);
+                    item.value[1] = s;
+                    break;
                 }
             }
         }
 
-
-        private static void SelectivelyIgnoreMouseButton(object sender,
-                                                         MouseButtonEventArgs e)
+        private void chkBox_Checked(object sender, RoutedEventArgs e)
         {
-            DependencyObject parent = e.OriginalSource as UIElement;
-            while (parent != null && !(parent is TextBox))
-                parent = VisualTreeHelper.GetParent(parent);
+         
+        }
 
-            if (parent != null)
+        private void chkBox_Checked_1(object sender, RoutedEventArgs e)
+        {
+            object o = ((CheckBox)sender).Parent;
+        }
+
+        private void chkBoxSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = (CheckBox)sender;
+            foreach (StringItems2 item in chkBoxListView.Items)
+                item.isChecked = (cb.IsChecked.HasValue && cb.IsChecked.Value);
+        }
+
+        private void chkBoxSelectAllFieldNames_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = (CheckBox)sender;
+            foreach (StringItems2 item in chkBoxListView.Items)
+                item.displayNameValue = (cb.IsChecked.HasValue && cb.IsChecked.Value);
+        }
+
+        private void chkBoxSelectAllAliasNames_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = (CheckBox)sender;
+            foreach (StringItems2 item in chkBoxListView.Items)
+                item.displayAliasValue = (cb.IsChecked.HasValue && cb.IsChecked.Value);
+        }
+
+        private void btnAddExpression_Click(object sender, RoutedEventArgs e)
+        {
+            string fieldName = cboFieldNames.SelectedValue as string;
+            string op = cboOperators.SelectedValue as string;
+            string value = txtSimpleExpression.Text;
+
+            Expression exp = new Expression(fieldName, op, value);
+
+            if(expressions == null)  
             {
-                var textBox = (TextBox)parent;
-                if (!textBox.IsKeyboardFocusWithin)
+                expressions = new ObservableCollection<StringItems2>();
+                lvExpressions.ItemsSource = expressions; 
+            }
+
+            //TODO this should add expression or something
+            expressions.Add(new StringItems2(exp.expression, exp._appendedOperators.ToList()));
+
+           
+
+            if (lvExpressions.Visibility == System.Windows.Visibility.Hidden)
+                lvExpressions.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void btnRemove_Click(object sender, RoutedEventArgs e)
+        {
+            ListViewItem i = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
+            expressions.Remove((StringItems2)i.Content);
+
+            if (expressions.Count == 0) 
+                lvExpressions.Visibility = System.Windows.Visibility.Hidden;
+
+        }
+
+        private static T FindAnchestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
                 {
-                    textBox.Focus();
-                    e.Handled = true;
+                    System.Diagnostics.Debug.WriteLine(current.ToString());
+                    return (T)current;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
+        }
+
+        private void btnAddAdvancedExpression_Click(object sender, RoutedEventArgs e)
+        {
+            Expression exp = new Expression(txtAdvancedExpression.Text);
+
+            if (expressions == null)
+            {
+                expressions = new ObservableCollection<StringItems2>();
+                lvExpressions.ItemsSource = expressions;
+            }
+
+            //TODO this should add expression or something 
+            expressions.Add(new StringItems2(exp.advancedExpression, exp._appendedOperators.ToList()));
+
+            lvExpressions.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void validateExpression_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (ListViewItem item in lvExpressions.ItemsSource)
+            {
+                
+            }
+
+            ////verify that results are returned
+            //string whereClause = string.Join(" ", expressions.ToArray());
+            //string lastThree = whereClause.Substring(whereClause.Length -3, whereClause.Length);
+            //string lastFour = whereClause.Substring(whereClause.Length -4, whereClause.Length);
+            
+            //if(lastThree == " OR") 
+            //    whereClause = whereClause.Substring(0, whereClause.Length -3);
+            //if(lastFour == " AND")
+            //    whereClause = whereClause.Substring(0, whereClause.Length -4);
+
+            //Query q = new Query(whereClause);
+
+            //validateExpression(q);
+
+        }
+
+        private async void validateExpression(Query q)
+        {
+            try
+            {
+                var qr = await DataSource.ExecuteQueryAsync(q);
+
+                if (qr.Error != null)
+                {
+                    MessageBox.Show(qr.Error.Message);
+                    return;
+                }
+
+                if (qr == null || qr.Features == null)
+                {
+                    return;
+                }
+                else
+                {
+                    MessageBox.Show(String.Format("Expression Valid...{0} features returned", qr.Features.Count));
                 }
             }
-        }
-
-        private static void SelectAllText(object sender, RoutedEventArgs e)
-        {
-            var textBox = e.OriginalSource as TextBox;
-            if (textBox != null)
-                textBox.SelectAll();
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
-
 }
