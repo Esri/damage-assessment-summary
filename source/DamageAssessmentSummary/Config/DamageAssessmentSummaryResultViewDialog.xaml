@@ -90,6 +90,7 @@
         </Style>
         <d:BoolConverter x:Key="convBool"/>
         <d:CountConverter x:Key="CountToVisibilityConverter" />
+        
     </Window.Resources>
     <Grid Margin="2,2,2,0" Height="auto" VerticalAlignment="Top">
         <Grid.RowDefinitions>
@@ -334,7 +335,7 @@
                                                             <ColumnDefinition Width="auto"/>
                                                             <ColumnDefinition Width="*"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="{Binding key}" Grid.Row="0" Grid.Column="0" Margin="10,10,10,10"/>
+                                                        <TextBlock Text="{Binding expression}" Grid.Row="0" Grid.Column="0" Margin="10,10,10,10"/>
 
                                                         <!--<ComboBox x:Name="cboAndOr"
                                                                   ItemsSource="{Binding value}"
@@ -348,10 +349,19 @@
                                                             --><!--<ComboBoxItem Content="AND"/>
                                                             <ComboBoxItem Content="OR"/>--><!--
                                                         </ComboBox>-->
-                                                            <ComboBox x:Name="cboAndOr" Width="100"                            
+                                                            <!--<ComboBox x:Name="cboAndOr" Width="100"                            
                                                                   Grid.Row="0" 
                                                                   Grid.Column="1" 
-                                                                  ItemsSource="{Binding Path=value}"
+                                                                  ItemsSource="{Binding Path=appendedOperators}"
+                                                                  SelectedValue="{Binding Path=appendedOperator}"
+                                                                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=Items, Converter={StaticResource CountToVisibilityConverter}}"
+                                                                  Margin="10,10,10,10"/>-->
+                                                        <ComboBox x:Name="cboAndOr" Width="100"                            
+                                                                  Grid.Row="0" 
+                                                                  Grid.Column="1" 
+                                                                  ItemsSource="{Binding Path=appendedOperators}"
+                                                                  SelectedValue="{Binding Path=appendedOperator}"
+                                                                  Visibility="{Binding Path=appendedOperatorVisible, Mode=TwoWay}"
                                                                   Margin="10,10,10,10"/>
                                                         <Button x:Name="btnRemove" Height="20" Content="Remove" Click="btnRemove_Click" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="2" Margin="10,10,10,10"/>
                                                     </Grid>

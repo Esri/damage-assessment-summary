@@ -16,6 +16,7 @@ using System.Windows.Data;
 using System.IO;
 using System.Diagnostics;
 using ESRI.ArcGIS.Client.Geometry;
+using System.Collections.ObjectModel;
 
 namespace DamageAssessmentSummary
 {
@@ -45,6 +46,18 @@ namespace DamageAssessmentSummary
         //{ Key=FieldName, Value=AliasOrUserName }
         [DataMember(Name = "additionalFields")]
         private Dictionary<string, string> AdditionalFields { get; set; }
+
+        [DataMember(Name = "whereClause")]
+        private string WhereClause { get; set; }
+
+        [DataMember(Name = "expressions")]
+        private ObservableCollection<Expression> Expressions { get; set; }
+
+        [DataMember(Name = "fieldNameAliasMap")]
+        private ObservableCollection<StringItems2> FieldNameAliasMap { get; set; }
+
+        [DataMember(Name = "newFields")]
+        private ObservableCollection<NewField> NewFields { get; set; }
 
         public DamageAssessmentSummaryResultView()
         {
@@ -128,13 +141,17 @@ namespace DamageAssessmentSummary
         public bool Configure(Window owner, IList<DataSource> dataSources)
         {
             // Show the configuration dialog.
-            Config.DamageAssessmentSummaryResultViewDialog dialog = new Config.DamageAssessmentSummaryResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, null) { Owner = owner };
+            Config.DamageAssessmentSummaryResultViewDialog dialog = new Config.DamageAssessmentSummaryResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, Expressions, FieldNameAliasMap, NewFields) { Owner = owner };
             if (dialog.ShowDialog() != true)
                 return false;
 
             // Retrieve the selected values for the properties from the configuration dialog.
             Caption = dialog.Caption;
             DataSourceId = dialog.DataSource.Id;
+            Expressions = dialog.expressions;
+            WhereClause = dialog.activeWhereClause;
+            FieldNameAliasMap = dialog.FieldNameAliasMap;
+            NewFields = dialog.NewFields;
 
             mapWidget = dialog.mapWidget;
 
@@ -238,7 +255,7 @@ namespace DamageAssessmentSummary
         private async void getData(DataSource ds)
         {
             //query/return all features
-            var result = await ds.ExecuteQueryAsync(new Query("1=1", null, true));
+            var result = await ds.ExecuteQueryAsync(new Query(WhereClause, null, true));
 
             //Create a list to store the returned results
             List<SiteDetails> items = new List<SiteDetails>();
@@ -251,6 +268,8 @@ namespace DamageAssessmentSummary
                 {
                     try
                     {
+                        //TODO thinking I should just handle the projections here
+                        // that way it only happens once rather than on each zoom
                         items.Add(new SiteDetails()
                         {
                             ZoomExtent = item.Geometry,
@@ -301,21 +320,33 @@ namespace DamageAssessmentSummary
         /// 
         private void ZoomToFeature_Click(object sender, RoutedEventArgs e)
         {
-            //Get the geometry from SiteDetails
-            Geometry g = ((SiteDetails)((Button)sender).DataContext).ZoomExtent;
-
-            //Get the map
-            ESRI.ArcGIS.Client.Map map = mapWidget.Map;
-
-            //If current resolution is close to min resolution pan to the feature, otherwise zoom to
-            if (map.Resolution.ToString("#.000000") == map.MinimumResolution.ToString("#.000000"))
-                map.PanTo(g);
-            else
+            try
             {
-                if (g is MapPoint)
-                    map.ZoomToResolution(map.MinimumResolution, (MapPoint)g);
+                //Get the geometry from SiteDetails
+                Geometry g = ((SiteDetails)((Button)sender).DataContext).ZoomExtent;
+
+                //Get the map
+                ESRI.ArcGIS.Client.Map map = mapWidget.Map;
+
+                if (g.SpatialReference != map.SpatialReference)
+                {
+                    //TODO...need to handle this
+                }
+
+                //If current resolution is close to min resolution pan to the feature, otherwise zoom to
+                if (map.Resolution.ToString("#.000000") == map.MinimumResolution.ToString("#.000000"))
+                    map.PanTo(g);
                 else
-                    map.ZoomTo(g);
+                {
+                    if (g is MapPoint)
+                        map.ZoomToResolution(map.MinimumResolution, (MapPoint)g);
+                    else
+                        map.ZoomTo(g);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 

@@ -25,21 +25,44 @@ namespace DamageAssessmentSummary.Config
         public DataSource DataSource { get; private set; }
 
         public IDictionary<string,string> AdditionalFieldNames { get; private set; }
-
-        //TODO...update this as values are modified for the user controled txt box
-        //private IDictionary<string, IList<string>> FieldNameAliasMap { get; set; }
-        private ObservableCollection<StringItems2> FieldNameAliasMap { get; set; }
-
+        public ObservableCollection<StringItems2> FieldNameAliasMap { get; private set; }
+        public string activeWhereClause {get; private set;}
         public string Caption { get; private set; }
         public MapWidget mapWidget { get; private set; }
+        public ObservableCollection<NewField> NewFields;
 
-        private ObservableCollection<StringItems2> expressions;
+        public ObservableCollection<Expression> expressions;
 
-        private enum fieldTypes { ParcelID, Address, IncidentName, DescriptionOfDamage, CurrentAssessedValue };
-
-        public DamageAssessmentSummaryResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, IEnumerable s)
+        public DamageAssessmentSummaryResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, ObservableCollection<Expression> Expressions, ObservableCollection<StringItems2> SelectFieldList, ObservableCollection<NewField> newFields)
         {
             InitializeComponent();
+
+
+
+            expressions = Expressions;
+
+            if (expressions != null)
+            {
+                lvExpressions.ItemsSource = expressions;
+  
+                expressions.CollectionChanged += expressions_CollectionChanged;
+
+                if (expressions.Count > 0)
+                {
+                    if (lvExpressions.Visibility == System.Windows.Visibility.Hidden)
+                        lvExpressions.Visibility = System.Windows.Visibility.Visible;
+                }
+            }
+
+            FieldNameAliasMap = SelectFieldList;
+            if (FieldNameAliasMap != null)
+            {
+                chkBoxListView.ItemsSource = FieldNameAliasMap;
+            }
+
+
+            populateNewFieldList(newFields);
+
 
             // When re-configuring, initialize the widget config dialog from the existing settings.
             CaptionTextBox.Text = initialCaption;
@@ -69,16 +92,10 @@ namespace DamageAssessmentSummary.Config
                 else
                     mapWidget = currentWidget;
             }
-
-            if (s != null)
-            {
-                rePopulateFieldList(s);
-            }
-            else
-            {
-                populateNewFieldList();
-            }
         }
+
+        private void resetState(ObservableCollection<Expression> Expressions)
+        { }
 
         private void rePopulateFieldList(IEnumerable s)
         {
@@ -97,15 +114,20 @@ namespace DamageAssessmentSummary.Config
 
             //chkBoxListView.ItemsSource = FieldNameAliasMap;
 
-            FieldNameAliasMap = new ObservableCollection<StringItems2>();
-
-            foreach (var field in ds.Fields)
+            if (FieldNameAliasMap == null)
             {
-                StringItems2 si2 = new StringItems2(field.Name, new List<string>() { field.Alias, field.Alias });
-                FieldNameAliasMap.Add(si2);
+                FieldNameAliasMap = new ObservableCollection<StringItems2>();
+
+                foreach (var field in ds.Fields)
+                {
+                    StringItems2 si2 = new StringItems2(field.Name, new List<string>() { field.Alias, field.Alias });
+                    si2.fieldType = field.Type;
+                    FieldNameAliasMap.Add(si2);
+                }
+
+                chkBoxListView.ItemsSource = FieldNameAliasMap;
             }
 
-            chkBoxListView.ItemsSource = FieldNameAliasMap;
 
             //IList<StringItems2> fieldNames = FieldNameAliasMap
             //    .Cast<StringItems2>().Where(item => item.isChecked == true).ToList();
@@ -121,10 +143,14 @@ namespace DamageAssessmentSummary.Config
         /// <summary>
         /// Create a list of any note fields
         /// </summary>
-        private void populateNewFieldList()
+        private void populateNewFieldList(ObservableCollection<NewField> newFields)
         {
-            NewField nf = new NewField("New Field Name");
-            lvNewFields.Items.Add(nf);
+            NewFields = newFields;
+
+            if (NewFields == null)
+                NewFields = new ObservableCollection<NewField>() { new NewField("New Note Field Name") };
+
+            lvNewFields.ItemsSource = NewFields;
         }
 
         /// <summary>
@@ -135,18 +161,35 @@ namespace DamageAssessmentSummary.Config
             DataSource = DataSourceSelector.SelectedDataSource;
             Caption = CaptionTextBox.Text;
 
+            if(expressions != null)
+                expressions.CollectionChanged -= expressions_CollectionChanged;
+
+            setActiveWhereClause();
+
+            if (lvNewFields.Items.Count > 1)
+            {
+                NewFields = lvNewFields.Items.SourceCollection as ObservableCollection<NewField>;
+            }
+
             IList<StringItems2> displayItems = chkBoxListView.Items
                     .Cast<StringItems2>().Where(item => item.isChecked == true).ToList();
 
-            AdditionalFieldNames = ConvertToDictionary(displayItems);
-
-            foreach (NewField item in lvNewFields.Items)
+            if(displayItems.Count > 0)
             {
-                if (item.Name != "New Field Name")
-                    AdditionalFieldNames.Add(item.Name, item.Name);
-            }
+                AdditionalFieldNames = ConvertToDictionary(displayItems);
 
-            DialogResult = true;
+                foreach (NewField item in lvNewFields.Items)
+                {
+                    if (item.Name != "New Note Field Name")
+                        AdditionalFieldNames.Add(item.Name, item.Name);
+                }
+
+                DialogResult = true;
+            }
+            else
+            {
+                MessageBox.Show("No display fields selected.\nPlease select at least one field to display.");
+            }
         }
 
         /// <summary>
@@ -245,11 +288,11 @@ namespace DamageAssessmentSummary.Config
         private void fieldName_TextChanged(object sender, TextChangedEventArgs e)
         {
             //string org = e.OriginalSource.ToString();
-          
+
             //string n = ((CheckBox)((StackPanel)((StackPanel)((TextBox)sender).Parent).Parent).Children[0]).Content.ToString();
 
             //updateAdditionalFields(n, ((ClickSelectTextBox)sender).Text);
-            
+
             //System.Diagnostics.Debug.WriteLine(n);
         }
 
@@ -304,16 +347,24 @@ namespace DamageAssessmentSummary.Config
 
             Expression exp = new Expression(fieldName, op, value);
 
+            foreach (StringItems2 item in FieldNameAliasMap)
+	        {
+                if (item.key == fieldName)
+                {
+                    exp.fieldType = item.fieldType;
+                    break;
+                }
+	        } 
+
             if(expressions == null)  
             {
-                expressions = new ObservableCollection<StringItems2>();
-                lvExpressions.ItemsSource = expressions; 
+                expressions = new ObservableCollection<Expression>();
+                lvExpressions.ItemsSource = expressions;
+                //TODO...may want to clean this up between when the diag is opened and closed
+                expressions.CollectionChanged += expressions_CollectionChanged;
             }
 
-            //TODO this should add expression or something
-            expressions.Add(new StringItems2(exp.expression, exp._appendedOperators.ToList()));
-
-           
+            expressions.Add(exp);
 
             if (lvExpressions.Visibility == System.Windows.Visibility.Hidden)
                 lvExpressions.Visibility = System.Windows.Visibility.Visible;
@@ -322,11 +373,10 @@ namespace DamageAssessmentSummary.Config
         private void btnRemove_Click(object sender, RoutedEventArgs e)
         {
             ListViewItem i = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
-            expressions.Remove((StringItems2)i.Content);
+            expressions.Remove((Expression)i.Content);
 
             if (expressions.Count == 0) 
                 lvExpressions.Visibility = System.Windows.Visibility.Hidden;
-
         }
 
         private static T FindAnchestor<T>(DependencyObject current) where T : DependencyObject
@@ -350,36 +400,43 @@ namespace DamageAssessmentSummary.Config
 
             if (expressions == null)
             {
-                expressions = new ObservableCollection<StringItems2>();
+                expressions = new ObservableCollection<Expression>();
                 lvExpressions.ItemsSource = expressions;
+                expressions.CollectionChanged += expressions_CollectionChanged;
             }
 
-            //TODO this should add expression or something 
-            expressions.Add(new StringItems2(exp.advancedExpression, exp._appendedOperators.ToList()));
+            expressions.Add(exp);
 
             lvExpressions.Visibility = System.Windows.Visibility.Visible;
         }
 
+        void expressions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (expressions.Count > 0)
+            {
+                //All items should show the appended operators except the last one
+                for (int i = 0; i < expressions.Count - 1; i++)
+                    expressions[i].appendedOperatorVisible = Visibility.Visible;
+
+                //the last one should not be visible
+                expressions[expressions.Count - 1].appendedOperatorVisible = System.Windows.Visibility.Hidden;
+            }
+        }
+
         private void validateExpression_Click(object sender, RoutedEventArgs e)
         {
-            foreach (ListViewItem item in lvExpressions.ItemsSource)
+            if (lvExpressions.Items.Count > 0)
             {
-                
+                setActiveWhereClause();
+
+                Query q = new Query(activeWhereClause);
+
+                validateExpression(q);
             }
-
-            ////verify that results are returned
-            //string whereClause = string.Join(" ", expressions.ToArray());
-            //string lastThree = whereClause.Substring(whereClause.Length -3, whereClause.Length);
-            //string lastFour = whereClause.Substring(whereClause.Length -4, whereClause.Length);
-            
-            //if(lastThree == " OR") 
-            //    whereClause = whereClause.Substring(0, whereClause.Length -3);
-            //if(lastFour == " AND")
-            //    whereClause = whereClause.Substring(0, whereClause.Length -4);
-
-            //Query q = new Query(whereClause);
-
-            //validateExpression(q);
+            else
+            {
+                MessageBox.Show("No expression to validate.\nPlease add an expression.");
+            }
 
         }
 
@@ -387,7 +444,9 @@ namespace DamageAssessmentSummary.Config
         {
             try
             {
-                var qr = await DataSource.ExecuteQueryAsync(q);
+                DataSource dataSource = DataSourceSelector.SelectedDataSource;
+
+                var qr = await dataSource.ExecuteQueryAsync(q);
 
                 if (qr.Error != null)
                 {
@@ -408,6 +467,33 @@ namespace DamageAssessmentSummary.Config
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void setActiveWhereClause()
+        {
+            string whereClause = "";
+
+            string finalAppendedOperator = "";
+
+            if (lvExpressions.Items.Count > 0)
+            {
+                foreach (Expression item in lvExpressions.ItemsSource)
+                {
+                    string expression = "";
+
+                    if (item.advancedExpression != null)
+                        expression = item.advancedExpression;
+                    if (item.expression != null)
+                        expression = item.expression;
+
+                    whereClause += String.Format("{0} {1} ", item.expression, item.appendedOperator);
+                    finalAppendedOperator = item.appendedOperator;
+                }
+
+                activeWhereClause = whereClause.Substring(0, whereClause.Length - (finalAppendedOperator.Length + 2));
+            }
+            else
+                activeWhereClause = "1=1";
         }
     }
 }

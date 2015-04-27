@@ -29,6 +29,7 @@ namespace DamageAssessmentSummary
 
         public string sourceFieldName { get; set; }
         public string displayFieldName { get; set; }
+        public ESRI.ArcGIS.Client.Field.FieldType fieldType { get; set; }
 
         public bool isChecked
         {
