@@ -107,13 +107,6 @@ namespace DamageAssessmentSummary.Config
         /// </summary>
         private void populateFieldList(DataSource ds)
         {
-            ////FieldNameAliasMap = new Dictionary<string, IList<string>>();
-
-            //foreach (var field in ds.Fields)
-            //    FieldNameAliasMap.Add(field.Name, new List<string>() { field.Alias, field.Alias });
-
-            //chkBoxListView.ItemsSource = FieldNameAliasMap;
-
             if (FieldNameAliasMap == null)
             {
                 FieldNameAliasMap = new ObservableCollection<StringItems2>();
@@ -121,22 +114,17 @@ namespace DamageAssessmentSummary.Config
                 foreach (var field in ds.Fields)
                 {
                     StringItems2 si2 = new StringItems2(field.Name, new List<string>() { field.Alias, field.Alias });
-                    si2.fieldType = field.Type;
+                    //si2.fieldType = field.Type;
                     FieldNameAliasMap.Add(si2);
                 }
 
                 chkBoxListView.ItemsSource = FieldNameAliasMap;
             }
 
-
-            //IList<StringItems2> fieldNames = FieldNameAliasMap
-            //    .Cast<StringItems2>().Where(item => item.isChecked == true).ToList();
             var fieldNames = from p in FieldNameAliasMap select p.key;
-
             cboFieldNames.ItemsSource = fieldNames;
 
             Operators operators = new Operators();
-
             cboOperators.ItemsSource = operators.operatorStrings;
         }
 
@@ -347,14 +335,14 @@ namespace DamageAssessmentSummary.Config
 
             Expression exp = new Expression(fieldName, op, value);
 
-            foreach (StringItems2 item in FieldNameAliasMap)
-	        {
-                if (item.key == fieldName)
-                {
-                    exp.fieldType = item.fieldType;
-                    break;
-                }
-	        } 
+            //foreach (StringItems2 item in FieldNameAliasMap)
+            //{
+            //    if (item.key == fieldName)
+            //    {
+            //        exp.fieldType = item.fieldType;
+            //        break;
+            //    }
+            //} 
 
             if(expressions == null)  
             {
@@ -416,10 +404,10 @@ namespace DamageAssessmentSummary.Config
             {
                 //All items should show the appended operators except the last one
                 for (int i = 0; i < expressions.Count - 1; i++)
-                    expressions[i].appendedOperatorVisible = Visibility.Visible;
+                    expressions[i].isVisible = true;
 
                 //the last one should not be visible
-                expressions[expressions.Count - 1].appendedOperatorVisible = System.Windows.Visibility.Hidden;
+                expressions[expressions.Count - 1].isVisible = false;
             }
         }
 

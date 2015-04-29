@@ -27,4 +27,3 @@ C:\Users\john4818\Documents\GitHub\damage-assessment-summary\source\DamageAssess
 C:\Users\john4818\Documents\GitHub\damage-assessment-summary\source\DamageAssessmentSummary\obj\Debug\DamageAssessmentSummary.csproj.GenerateResource.Cache
 C:\Users\john4818\Documents\GitHub\damage-assessment-summary\source\DamageAssessmentSummary\obj\Debug\DamageAssessmentSummary.dll
 C:\Users\john4818\Documents\GitHub\damage-assessment-summary\source\DamageAssessmentSummary\obj\Debug\DamageAssessmentSummary.pdb
-C:\Users\john4818\Documents\GitHub\damage-assessment-summary\source\DamageAssessmentSummary\obj\Debug\DamageAssessmentSummary.csprojResolveAssemblyReference.cache

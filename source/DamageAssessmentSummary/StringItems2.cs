@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DamageAssessmentSummary
 {
+    [DataContract]
     public class StringItems2 : INotifyPropertyChanged
     {
         bool _isChecked;
@@ -14,6 +16,11 @@ namespace DamageAssessmentSummary
         bool _displayAliasValue;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public StringItems2()
+        {
+ 
+        }
 
         public StringItems2(string Key, List<string> Value)
         {
@@ -24,13 +31,22 @@ namespace DamageAssessmentSummary
             displayAliasValue = true;
         }
 
+        [DataMember]
         public string key { get; set; }
+
+        [DataMember]
         public List<string> value { get; set; }
 
+        [DataMember]
         public string sourceFieldName { get; set; }
-        public string displayFieldName { get; set; }
-        public ESRI.ArcGIS.Client.Field.FieldType fieldType { get; set; }
 
+        [DataMember]
+        public string displayFieldName { get; set; }
+
+        //[DataMember]
+        //public ESRI.ArcGIS.Client.Field.FieldType fieldType { get; set; }
+
+        [DataMember]
         public bool isChecked
         {
             get { return _isChecked; }
@@ -54,6 +70,7 @@ namespace DamageAssessmentSummary
             }
         }
 
+        [DataMember]
         public bool displayNameValue
         {
             get { return _displayNameValue; }
@@ -68,6 +85,7 @@ namespace DamageAssessmentSummary
             }
         }
 
+        [DataMember]
         public bool displayAliasValue
         {
             get { return _displayAliasValue; }

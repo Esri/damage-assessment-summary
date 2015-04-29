@@ -77,7 +77,6 @@
     <Compile Include="Config\DamageAssessmentSummaryResultViewDialog.xaml.cs">
       <DependentUpon>DamageAssessmentSummaryResultViewDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CountConvert2.cs" />
     <Compile Include="CountConverter.cs" />
     <Compile Include="DamageAssessmentSummaryResultView.xaml.cs">
       <DependentUpon>DamageAssessmentSummaryResultView.xaml</DependentUpon>

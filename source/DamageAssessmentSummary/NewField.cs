@@ -1,29 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DamageAssessmentSummary
 {
+    [DataContract]
     public class NewField
     {
-        //private string _name;
-
-        //public NewField(string name)
-        //{
-        //    Name = name;
-        //}
-        //public string Name
-        //{
-        //    get { return _name; }
-        //    set
-        //    {
-        //        _name = value;
-        //    }
-        //}
-
+        public NewField() { }
         public NewField(string name) { Name = name; }
+
+        [DataMember]
         public string Name { get; set; }
     }
 }
