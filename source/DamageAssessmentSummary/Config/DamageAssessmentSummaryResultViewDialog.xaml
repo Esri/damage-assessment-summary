@@ -6,7 +6,8 @@
         xmlns:d="clr-namespace:DamageAssessmentSummary"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight"
-        Title="Configure Summary Report">
+        Title="Configure Summary Report"
+        xmlns:controls="clr-namespace:DamageAssessmentSummary.Controls">
     <Window.Resources>
         <!--<DataTemplate x:Key="chkBoxItemDataTemplate">
             <StackPanel Orientation="Horizontal">
@@ -43,56 +44,11 @@
                 </StackPanel>
             </StackPanel>
         </DataTemplate>-->
-        <DataTemplate x:Key="newFieldItemDataTemplate">
-            <StackPanel Orientation="Horizontal">
-                <d:ClickableTextBox x:Name="fieldName" 
-                                    Text="{Binding Path=Name}" 
-                                    MinWidth="200" />
-                <CheckBox x:Name="removeField" 
-                          Content="Remove" 
-                          CheckBox.Checked="removeField_Checked">
-                </CheckBox>
-            </StackPanel>
-        </DataTemplate>
-        <Style x:Key="lvStyle" TargetType="ListViewItem">
-            <Style.Triggers>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                    <Setter Property="IsSelected" Value="True" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="ItemContStyle" TargetType="ListViewItem">
-            <Style.Resources>
-                <LinearGradientBrush x:Key="MouseOverBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
-                    <GradientStop Color="#22000000" Offset="0" />
-                    <GradientStop Color="#44000000" Offset="0.4" />
-                    <GradientStop Color="#55000000" Offset="0.6" />
-                    <GradientStop Color="#33000000" Offset="0.9" />
-                    <GradientStop Color="#22000000" Offset="1" />
-                </LinearGradientBrush>
-            </Style.Resources>
-            <Setter Property="Padding" Value="0,4" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <!-- The default control template for ListViewItem has a Border 
-           which contains the item's content. -->
-            <Setter Property="Border.BorderThickness" Value="0,0,0,0.5" />
-            <Setter Property="Border.BorderBrush" Value="LightGray" />
-            <!-- These triggers react to changes in the attached properties set
-           during a managed drag-drop operation. -->
-            <Style.Triggers>
-                <Trigger Property="d:ListViewItemDragState.IsBeingDragged" Value="True">
-                    <Setter Property="FontWeight" Value="DemiBold" />
-                </Trigger>
-                <Trigger Property="d:ListViewItemDragState.IsUnderDragCursor" Value="True">
-                    <Setter Property="Background" Value="{StaticResource MouseOverBrush}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <d:BoolConverter x:Key="convBool"/>
-        <d:CountConverter x:Key="CountToVisibilityConverter" />
+
+        <!--<d:CountConverter x:Key="CountToVisibilityConverter" />-->
         <!--<d:BoolToVisibilityConverter x:Key="boolToVisibilityConverter"/>-->
-        <d:testConverter x:Key="tc"/>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <!--<d:testConverter x:Key="tc"/>-->
+        
     </Window.Resources>
     <Grid Margin="2,2,2,0" Height="auto" VerticalAlignment="Top">
         <Grid.RowDefinitions>
@@ -177,106 +133,7 @@
                                 <TextBlock Text="Select Display Fields"/>
                             </Expander.Header>
                             <Expander.Content>
-                                <GroupBox Grid.Row="1" 
-                                          Grid.ColumnSpan="2">
-                                    <StackPanel Grid.ColumnSpan="2" 
-                                                Margin="10,10,10,10">
-                                        <StackPanel Orientation="Horizontal">
-                                            <CheckBox x:Name="chkBoxSelectAll" 
-                                                  Content="Display All" 
-                                                  Click="chkBoxSelectAll_Click"
-                                                  Margin="10,10,10,10"/>
-                                            <!--<CheckBox x:Name="chkBoxSelectAllAliasNames" 
-                                                  Content="Activate All Alias Fields" 
-                                                  Click="chkBoxSelectAllAliasNames_Click"
-                                                  Margin="10,10,10,10"/>
-                                            <CheckBox x:Name="chkBoxSelectAllFieldNames" 
-                                                  Content="Activate All Alias Fields" 
-                                                  Click="chkBoxSelectAllFieldNames_Click"
-                                                  Margin="10,10,10,10"/>-->
-                                        </StackPanel>
-                                        <d:DraggableListView x:Name="chkBoxListView" 
-                                                  SelectionMode="Single" 
-                                                  ItemContainerStyle="{StaticResource ItemContStyle}"
-                                                  MinWidth="300"
-                                                             MaxHeight="500"
-                                                  Grid.ColumnSpan="2">
-                                            <d:DraggableListView.View>
-                                                <GridView>
-                                                    <GridViewColumn Header="Display" 
-                                                            Width="50" >
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate >
-                                                                <CheckBox x:Name="chkBox" 
-                                                                  IsChecked="{Binding isChecked}" 
-                                                                  Checked="chkBox_Checked_1" 
-                                                                  HorizontalAlignment="Center"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                    <GridViewColumn Header="Is Active">
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <CheckBox x:Name="aliasChkBox" 
-                                                                          IsChecked="{Binding displayAliasValue}" 
-                                                                          IsEnabled="{Binding isChecked}"
-                                                                          HorizontalAlignment="Center"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                    <GridViewColumn Header="Field Alias">
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <d:ClickableTextBox x:Name="fieldAlias" 
-                                                                                    MinWidth="200"  
-                                                                                    Text="{Binding Path=value[1], Mode=TwoWay}"
-                                                                                    TextChanged="fieldName_TextChanged">
-                                                                    <d:ClickableTextBox.IsEnabled>
-                                                                        <MultiBinding Converter="{StaticResource convBool}">
-                                                                            <Binding Path="isChecked" />
-                                                                            <Binding Path="displayAliasValue" />
-                                                                        </MultiBinding>
-                                                                    </d:ClickableTextBox.IsEnabled>
-                                                                </d:ClickableTextBox>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                    <GridViewColumn Header="Is Active">
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <CheckBox x:Name="aliasChkBox" 
-                                                                          IsChecked="{Binding displayNameValue}" 
-                                                                          IsEnabled="{Binding isChecked}"
-                                                                          HorizontalAlignment="Center"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                    <GridViewColumn Header="Field Name">
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <TextBlock x:Name="fieldName"
-                                                                                    Text="{Binding key}" 
-                                                                                    MinWidth="200" 
-                                                                                    IsEnabled="{Binding displayNameValue}"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                </GridView>
-                                            </d:DraggableListView.View>
-                                        </d:DraggableListView>
-                                        <!--<ListView x:Name="chkBoxListView" 
-                                                  SelectionMode="Multiple" 
-                                                  ItemsSource="{Binding}" 
-                                                  ItemTemplate="{StaticResource chkBoxItemDataTemplate}" 
-                                                  CheckBox.Unchecked="chkBoxListView_Unchecked" 
-                                                  ScrollViewer.CanContentScroll="True" 
-                                                  ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                                                  MaxHeight="150" 
-                                                  MinWidth="300" 
-                                                  Grid.ColumnSpan="2"/>-->
-                                    </StackPanel>
-                                </GroupBox>
+                                <controls:FieldListControl x:Name="fieldListControl"/>
                             </Expander.Content>
                         </Expander>
                         <Expander ScrollViewer.CanContentScroll="True" 
@@ -288,80 +145,7 @@
                                 <TextBlock Text="Add Query Filters"/>
                             </Expander.Header>
                             <Expander.Content>
-                                <GroupBox>
-                                    <StackPanel Orientation="Vertical">
-                                        <TabControl Margin="10,10,10,10">
-                                            <TabItem Header="Simple Query" HorizontalContentAlignment="Stretch">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto"/>
-                                                        <ColumnDefinition Width="auto"/>
-                                                        <ColumnDefinition Width="auto"/>
-                                                        <ColumnDefinition Width="auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                <!--<StackPanel Orientation="Horizontal" Margin="10,10,10,10">-->
-                                                    <ComboBox x:Name="cboFieldNames" Margin="10,10,10,10" MinWidth="75" Grid.Column="0" Grid.Row="0" SelectedIndex="0"/>
-                                                    <ComboBox x:Name="cboOperators" Margin="10,10,10,10" MinWidth="50" Grid.Column="1" Grid.Row="0" SelectedIndex="0"/>
-                                                    <d:ClickableTextBox x:Name="txtSimpleExpression" MinWidth="200" Margin="10,10,10,10" Grid.Column="2" Grid.Row="0"/>
-                                                    <Button x:Name="btnAddExpression" Content="Add" Click="btnAddExpression_Click" Height="20" Width="35" Grid.Column="3" Grid.Row="0" HorizontalAlignment="Right" />
-                                                <!--</StackPanel>-->
-                                                </Grid>
-                                            </TabItem>
-                                            <TabItem Header="Advanced Query" HorizontalContentAlignment="Stretch">
-                                                <Grid HorizontalAlignment="Stretch">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <d:ClickableTextBox x:Name="txtAdvancedExpression" MinWidth="200" Margin="10,10,10,10" Height="20" Grid.Column="0" Grid.Row="0"/>
-                                                    <Button x:Name="btnAddAdvancedExpression" Content="Add" Click="btnAddAdvancedExpression_Click" Height="20" Width="35" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="10,10,10,10"/> 
-                                                </Grid>
-                                            </TabItem>
-                                        </TabControl>
-
-                                        <ListView x:Name="lvExpressions" Width="auto" Visibility="Hidden" Margin="10,10,10,10" HorizontalContentAlignment="Stretch">
-                                            <ListView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid HorizontalAlignment="Stretch">
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="auto"/>
-                                                        </Grid.RowDefinitions>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="auto"/>
-                                                            <ColumnDefinition Width="auto"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="{Binding expression}" Grid.Row="0" Grid.Column="0" Margin="10,10,10,10"/>
-                                                        <!--<ComboBox x:Name="cboAndOr" Width="100"                            
-                                                                  Grid.Row="0" 
-                                                                  Grid.Column="1" 
-                                                                  ItemsSource="{Binding Path=appendedOperators}"
-                                                                  SelectedValue="{Binding Path=appendedOperator}"
-                                                                  Margin="10,10,10,10"/>-->
-                                                        <!--FI-->
-                                                        <ComboBox x:Name="cboAndOr" Width="100"                            
-                                                                  Grid.Row="0" 
-                                                                  Grid.Column="1" 
-                                                                  ItemsSource="{Binding Path=appendedOperators}"
-                                                                  SelectedValue="{Binding Path=appendedOperator}"
-                                                                  Visibility="{Binding Path=isVisible, Converter={StaticResource BoolToVis}, Mode=TwoWay}"
-                                                                  Margin="10,10,10,10"/>
-                                                        <Button x:Name="btnRemove" Height="20" Content="Remove" Click="btnRemove_Click" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="2" Margin="10,10,10,10"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListView.ItemTemplate>
-                                        </ListView>
-
-                                        <Button x:Name="btnValidateExpression" Content="Validate Expression" HorizontalAlignment="Center" Margin="10,10,10,10" Click="validateExpression_Click"/>
-                                        
-                                    </StackPanel>
-                                </GroupBox>
+                                <controls:FilterControl x:Name="filterControl" />
                             </Expander.Content>
                         </Expander>
                     </StackPanel>
@@ -372,34 +156,12 @@
                       Grid.Row="2" 
                       Grid.ColumnSpan="2" 
                       Margin="10,10,10,10">
-                <Expander ScrollViewer.CanContentScroll="True" 
-                          ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                          Grid.Row="2" 
-                          Grid.ColumnSpan="2">
+                <Expander>
                 <Expander.Header>
                     <TextBlock Text="Add Note Fields"/>
                 </Expander.Header>
                 <Expander.Content>
-
-                        <Grid Margin="10" 
-                              Grid.ColumnSpan="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-                            <ListView x:Name="lvNewFields" 
-                                      ItemsSource="{Binding}" 
-                                      ItemTemplate="{StaticResource newFieldItemDataTemplate}" 
-                                      MaxHeight="300" ScrollViewer.CanContentScroll="True" 
-                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                      ItemContainerStyle="{StaticResource lvStyle}">
-                            </ListView>
-                        </Grid>
-                    
+                        <controls:NoteFieldControl x:Name="noteFieldControl" />
                 </Expander.Content>
             </Expander>
             </GroupBox>

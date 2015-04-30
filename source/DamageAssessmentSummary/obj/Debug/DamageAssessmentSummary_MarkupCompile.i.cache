@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 
-2-528288131
+5504092625
 
-20-866951568
+231164096707
 16103284374
-Config\DamageAssessmentSummaryResultViewDialog.xaml;DamageAssessmentSummaryResultView.xaml;
+Config\DamageAssessmentSummaryResultViewDialog.xaml;Controls\FieldListControl.xaml;Controls\FilterControl.xaml;Controls\NoteFieldControl.xaml;DamageAssessmentSummaryResultView.xaml;
 
-False
+True
 

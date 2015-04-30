@@ -14,14 +14,6 @@ namespace DamageAssessmentSummary
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            //int count = System.Convert.ToInt32(value);
-
-            //if (count > 1)
-            //{
-            //    return System.Windows.Visibility.Visible;
-            //}
-            //return System.Windows.Visibility.Hidden;
-
             if (value is ItemCollection)
             {
                 ItemCollection items = (ItemCollection)value;
@@ -29,10 +21,6 @@ namespace DamageAssessmentSummary
                 {
                     object o = items.GetItemAt(i);
                 }
-                //if (items.Count > 1)
-                //{
-                //    return System.Windows.Visibility.Visible;
-                //}
             }
             return System.Windows.Visibility.Hidden;
         }

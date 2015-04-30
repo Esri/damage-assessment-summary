@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using DamageAssessmentSummary.Model;
 
-namespace DamageAssessmentSummary
+namespace DamageAssessmentSummary.Model
 {
     [DataContract]
     public class StringItems2 : INotifyPropertyChanged
@@ -43,8 +44,8 @@ namespace DamageAssessmentSummary
         [DataMember]
         public string displayFieldName { get; set; }
 
-        //[DataMember]
-        //public ESRI.ArcGIS.Client.Field.FieldType fieldType { get; set; }
+        [DataMember]
+        public Model.Expression.fieldType FieldType { get; set; }
 
         [DataMember]
         public bool isChecked

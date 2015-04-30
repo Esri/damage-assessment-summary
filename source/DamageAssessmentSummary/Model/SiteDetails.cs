@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DamageAssessmentSummary
+namespace DamageAssessmentSummary.Model
 {
     /// <summary>
     /// class used to store the values from the features that are passed to the list
@@ -18,6 +18,8 @@ namespace DamageAssessmentSummary
 
         //[DataMember]
         //public ESRI.ArcGIS.Client.Geometry.Geometry ZoomExtent { get; set; }
+        [DataMember]
+        public string ZoomExtent { get; set; }
 
         [DataMember]
         public IList<StringItems> AdditionalFieldsAndValues { get; set; }

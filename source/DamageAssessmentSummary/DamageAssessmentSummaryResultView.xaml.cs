@@ -17,6 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using ESRI.ArcGIS.Client.Geometry;
 using System.Collections.ObjectModel;
+using DamageAssessmentSummary.Model;
 
 namespace DamageAssessmentSummary
 {
@@ -51,7 +52,7 @@ namespace DamageAssessmentSummary
         private string WhereClause { get; set; }
 
         [DataMember(Name = "expressions")]
-        private ObservableCollection<Expression> Expressions { get; set; }
+        private ObservableCollection<Model.Expression> Expressions { get; set; }
 
         [DataMember(Name = "fieldNameAliasMap")]
         private ObservableCollection<StringItems2> FieldNameAliasMap { get; set; }
@@ -151,7 +152,7 @@ namespace DamageAssessmentSummary
             Expressions = dialog.expressions;
             WhereClause = dialog.activeWhereClause;
             FieldNameAliasMap = dialog.FieldNameAliasMap;
-            NewFields = dialog.NewFields;
+            NewFields = dialog.NoteFields;
 
             mapWidget = dialog.mapWidget;
 
@@ -270,14 +271,9 @@ namespace DamageAssessmentSummary
                     {
                         //TODO thinking I should just handle the projections here
                         // that way it only happens once rather than on each zoom
-                        //items.Add(new SiteDetails()
-                        //{
-                        //    ZoomExtent = item.Geometry,
-                        //    AdditionalFieldsAndValues = createNewFieldList(item),
-                        //    LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : ""
-                        //});
                         items.Add(new SiteDetails()
                         {
+                            ZoomExtent = item.Geometry.ToJson(),
                             AdditionalFieldsAndValues = createNewFieldList(item),
                             LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : ""
                         });
@@ -328,26 +324,26 @@ namespace DamageAssessmentSummary
             try
             {
                 //Get the geometry from SiteDetails
-                //Geometry g = ((SiteDetails)((Button)sender).DataContext).ZoomExtent;
+                Geometry g = Geometry.FromJson(((SiteDetails)((Button)sender).DataContext).ZoomExtent);
 
                 //Get the map
                 ESRI.ArcGIS.Client.Map map = mapWidget.Map;
 
-                //if (g.SpatialReference != map.SpatialReference)
-                //{
-                //    //TODO...need to handle this
-                //}
+                if (g.SpatialReference.WKID != map.SpatialReference.WKID)
+                {
+                    //TODO...need to handle this
+                }
 
-                ////If current resolution is close to min resolution pan to the feature, otherwise zoom to
-                //if (map.Resolution.ToString("#.000000") == map.MinimumResolution.ToString("#.000000"))
-                //    map.PanTo(g);
-                //else
-                //{
-                //    if (g is MapPoint)
-                //        map.ZoomToResolution(map.MinimumResolution, (MapPoint)g);
-                //    else
-                //        map.ZoomTo(g);
-                //}
+                //If current resolution is close to min resolution pan to the feature, otherwise zoom to
+                if (map.Resolution.ToString("#.000000") == map.MinimumResolution.ToString("#.000000"))
+                    map.PanTo(g);
+                else
+                {
+                    if (g is MapPoint)
+                        map.ZoomToResolution(map.MinimumResolution, (MapPoint)g);
+                    else
+                        map.ZoomTo(g);
+                }
             }
             catch (Exception ex)
             {

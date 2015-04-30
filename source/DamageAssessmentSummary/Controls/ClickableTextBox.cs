@@ -1,6 +1,7 @@
 ﻿using DamageAssessmentSummary.Config;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using DamageAssessmentSummary.Model;
 
-namespace DamageAssessmentSummary
+namespace DamageAssessmentSummary.Controls
 {
     /// <summary>
     /// enables serveral additional features for a standard TextBox
@@ -62,8 +64,9 @@ namespace DamageAssessmentSummary
 
                 if (lv.SelectedIndex == lv.Items.Count - 1)
                 {
-                    NewField nf = new NewField("New Field Name");
-                    lv.Items.Add(nf);
+                    NewField nf = new NewField("New Note Field Name");
+                    ObservableCollection<NewField> source = lv.ItemsSource as ObservableCollection<NewField>;
+                    source.Add(nf);
                 }
             }
         }

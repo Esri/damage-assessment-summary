@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="DamageAssessmentSummary.Controls.NoteFieldControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:DamageAssessmentSummary"
+             xmlns:controls="clr-namespace:DamageAssessmentSummary.Controls">
+    <UserControl.Resources>
+        <DataTemplate x:Key="newFieldItemDataTemplate">
+            <StackPanel Orientation="Horizontal">
+                <controls:ClickableTextBox x:Name="fieldName" 
+                                        Text="{Binding Path=Name}" 
+                                        MinWidth="200" />
+                <CheckBox x:Name="removeField" 
+                          Content="Remove" 
+                          CheckBox.Checked="removeField_Checked">
+                </CheckBox>
+            </StackPanel>
+        </DataTemplate>
+        <Style x:Key="lvStyle" 
+               TargetType="ListViewItem">
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocusWithin" 
+                         Value="True">
+                    <Setter Property="IsSelected" 
+                            Value="True" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="lvNewFields" 
+                  ItemsSource="{Binding}" 
+                  ItemTemplate="{StaticResource newFieldItemDataTemplate}" 
+                  MaxHeight="300" 
+                  ScrollViewer.CanContentScroll="True"                
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"              
+                  ItemContainerStyle="{StaticResource lvStyle}">
+        </ListView>
+    </Grid>
+</UserControl>

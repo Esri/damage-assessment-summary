@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DamageAssessmentSummary
+namespace DamageAssessmentSummary.Model
 {
     /// <summary>
     /// store the key value pair...using this instead of the out of the box KeyValuePair class 
