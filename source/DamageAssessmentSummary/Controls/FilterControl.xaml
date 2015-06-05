@@ -59,12 +59,17 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <controls:ClickableTextBox x:Name="txtAdvancedExpression" 
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock Text="SELECT * FROM DATASOURCE WHERE" Margin="10,10,10,10" Height="20"/>
+
+                                <controls:ClickableTextBox x:Name="txtAdvancedExpression" 
                                                        MinWidth="200" 
                                                        Margin="10,10,10,10" 
                                                        Height="20" 
                                                        Grid.Column="0" 
                                                        Grid.Row="0"/>
+                            </StackPanel>
                             <Button x:Name="btnAddAdvancedExpression" 
                                     Content="Add" 
                                     Click="btnAddAdvancedExpression_Click"  

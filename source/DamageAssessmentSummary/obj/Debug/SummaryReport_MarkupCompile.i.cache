@@ -16,5 +16,5 @@ DEBUG;TRACE
 16103284374
 Config\ConfigureSummaryReportResultViewDialog.xaml;Controls\FieldListControl.xaml;Controls\FilterControl.xaml;Controls\NoteFieldControl.xaml;ConfigureSummaryReportResultView.xaml;
 
-True
+False
 
