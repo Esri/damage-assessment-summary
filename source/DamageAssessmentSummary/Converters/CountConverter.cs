@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace DamageAssessmentSummary
+namespace ConfigureSummaryReport
 {
     public class CountConverter : IValueConverter
     {

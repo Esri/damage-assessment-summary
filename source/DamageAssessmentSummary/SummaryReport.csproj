@@ -8,8 +8,8 @@
     <ProjectGuid>{EC1B51DD-EA95-4490-AC52-B4813D234C4D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DamageAssessmentSummary</RootNamespace>
-    <AssemblyName>DamageAssessmentSummary</AssemblyName>
+    <RootNamespace>SummaryReport</RootNamespace>
+    <AssemblyName>SummaryReport</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -74,8 +74,8 @@
   <ItemGroup>
     <Compile Include="Converters\BoolConverter.cs" />
     <Compile Include="Controls\ClickableTextBox.cs" />
-    <Compile Include="Config\DamageAssessmentSummaryResultViewDialog.xaml.cs">
-      <DependentUpon>DamageAssessmentSummaryResultViewDialog.xaml</DependentUpon>
+    <Compile Include="Config\ConfigureSummaryReportResultViewDialog.xaml.cs">
+      <DependentUpon>ConfigureSummaryReportResultViewDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\FieldListControl.xaml.cs">
       <DependentUpon>FieldListControl.xaml</DependentUpon>
@@ -87,8 +87,8 @@
       <DependentUpon>NoteFieldControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\CountConverter.cs" />
-    <Compile Include="DamageAssessmentSummaryResultView.xaml.cs">
-      <DependentUpon>DamageAssessmentSummaryResultView.xaml</DependentUpon>
+    <Compile Include="ConfigureSummaryReportResultView.xaml.cs">
+      <DependentUpon>ConfigureSummaryReportResultView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\DraggableListView.cs" />
     <Compile Include="Model\Expression.cs" />
@@ -122,7 +122,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Config\DamageAssessmentSummaryResultViewDialog.xaml">
+    <Page Include="Config\ConfigureSummaryReportResultViewDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -138,7 +138,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DamageAssessmentSummaryResultView.xaml">
+    <Page Include="ConfigureSummaryReportResultView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

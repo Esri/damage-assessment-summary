@@ -1,13 +1,13 @@
-﻿<Window x:Class="DamageAssessmentSummary.Config.DamageAssessmentSummaryResultViewDialog"
+﻿<Window x:Class="ConfigureSummaryReport.Config.ConfigureSummaryReportResultViewDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:opsDash="clr-namespace:ESRI.ArcGIS.OperationsDashboard;assembly=ESRI.ArcGIS.OperationsDashboard"
         xmlns:opsDashCtl="clr-namespace:ESRI.ArcGIS.OperationsDashboard.Controls;assembly=ESRI.ArcGIS.OperationsDashboard"
-        xmlns:d="clr-namespace:DamageAssessmentSummary"
+        xmlns:d="clr-namespace:ConfigureSummaryReport"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight"
         Title="Configure Summary Report"
-        xmlns:controls="clr-namespace:DamageAssessmentSummary.Controls">
+        xmlns:controls="clr-namespace:ConfigureSummaryReport.Controls">
     <Window.Resources>
         <!--<DataTemplate x:Key="chkBoxItemDataTemplate">
             <StackPanel Orientation="Horizontal">

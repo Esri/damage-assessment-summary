@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DamageAssessmentSummary.Model
+namespace ConfigureSummaryReport.Model
 {
     [DataContract]
     public class NewField

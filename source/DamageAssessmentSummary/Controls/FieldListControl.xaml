@@ -1,10 +1,10 @@
-﻿<UserControl x:Class="DamageAssessmentSummary.Controls.FieldListControl"
+﻿<UserControl x:Class="ConfigureSummaryReport.Controls.FieldListControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DamageAssessmentSummary"
-             xmlns:controls="clr-namespace:DamageAssessmentSummary.Controls">
+             xmlns:local="clr-namespace:ConfigureSummaryReport"
+             xmlns:controls="clr-namespace:ConfigureSummaryReport.Controls">
     <UserControl.Resources>
         <Style x:Key="ItemContStyle" TargetType="ListViewItem">
             <Style.Resources>
@@ -43,16 +43,13 @@
                     <CheckBox x:Name="chkBoxSelectAll" 
                               Content="Display All" 
                               Click="chkBoxSelectAll_Click"
+                              IsChecked="False"
                               Margin="10,10,10,10"/>
-                    <!--Could enable these if we want to support select all for field alias or name-->
-                    <!--<CheckBox x:Name="chkBoxSelectAllAliasNames" 
-                                                  Content="Activate All Alias Fields" 
-                                                  Click="chkBoxSelectAllAliasNames_Click"
-                                                  Margin="10,10,10,10"/>
-                    <CheckBox x:Name="chkBoxSelectAllFieldNames" 
-                            Content="Activate All Alias Fields" 
-                            Click="chkBoxSelectAllFieldNames_Click"
-                            Margin="10,10,10,10"/>-->
+                    <CheckBox x:Name="chkBoxUseAliasName" 
+                              Content="Display Alias Name" 
+                              Click="chkBoxSelectAllAliasNames_Click"
+                              IsChecked="True"
+                              Margin="10,10,10,10"/>
                 </StackPanel>
                 <controls:DraggableListView x:Name="chkBoxListView" 
                                             SelectionMode="Single" 
@@ -69,17 +66,9 @@
                                     <DataTemplate >
                                         <CheckBox x:Name="chkBox" 
                                                   IsChecked="{Binding isChecked}" 
-                                                  HorizontalAlignment="Center"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Is Active">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox x:Name="aliasChkBox" 
-                                                  IsChecked="{Binding displayAliasValue}" 
-                                                  IsEnabled="{Binding isChecked}"
-                                                  HorizontalAlignment="Center"/>
+                                                  HorizontalAlignment="Center"
+                                                  Click="chkBox_Click"
+                                                  Checked="chkBox_Checked"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -99,23 +88,24 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Is Active">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox x:Name="aliasChkBox" 
-                                                  IsChecked="{Binding displayNameValue}" 
-                                                  IsEnabled="{Binding isChecked}"
-                                                  HorizontalAlignment="Center"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
                             <GridViewColumn Header="Field Name">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock x:Name="fieldName"
                                                    Text="{Binding key}" 
-                                                   MinWidth="200" 
-                                                   IsEnabled="{Binding displayNameValue}"/>
+                                                   MinWidth="200"
+                                                   IsEnabled="{Binding displayNameValue, Mode=TwoWay}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsEnabled" Value="False">
+                                                            <Setter Property="Foreground"
+                                                                    Value="{StaticResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

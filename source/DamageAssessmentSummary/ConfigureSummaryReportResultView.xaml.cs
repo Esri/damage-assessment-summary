@@ -17,9 +17,9 @@ using System.IO;
 using System.Diagnostics;
 using ESRI.ArcGIS.Client.Geometry;
 using System.Collections.ObjectModel;
-using DamageAssessmentSummary.Model;
+using ConfigureSummaryReport.Model;
 
-namespace DamageAssessmentSummary
+namespace ConfigureSummaryReport
 {
     /// <summary>
     /// A Widget is a dockable add-in class for Operations Dashboard for ArcGIS that implements IWidget. By returning true from CanConfigure, 
@@ -30,10 +30,10 @@ namespace DamageAssessmentSummary
     [Export("ESRI.ArcGIS.OperationsDashboard.Widget")]
     [ExportMetadata("DisplayName", "Summary Report Tool")]
     [ExportMetadata("Description", "Select key fields from a feature service and export to CSV")]
-    [ExportMetadata("ImagePath", "/DamageAssessmentSummary;component/Images/Widget32.png")]
+    [ExportMetadata("ImagePath", "/SummaryReport;component/Images/Widget32.png")]
     [ExportMetadata("DataSourceRequired", true)]
     [DataContract]
-    public partial class DamageAssessmentSummaryResultView : UserControl, IWidget, IDataSourceConsumer, IMapWidgetConsumer
+    public partial class ConfigureSummaryReportResultView : UserControl, IWidget, IDataSourceConsumer, IMapWidgetConsumer
     {
         [DataMember(Name = "dataSourceId")]
         public string DataSourceId { get; set; }
@@ -60,7 +60,13 @@ namespace DamageAssessmentSummary
         [DataMember(Name = "newFields")]
         private ObservableCollection<NewField> NewFields { get; set; }
 
-        public DamageAssessmentSummaryResultView()
+        [DataMember(Name = "useAliasName")]
+        private bool UseAliasName { get; set; }
+
+        [DataMember(Name = "allSelected")]
+        private bool AllSelected { get; set; }
+
+        public ConfigureSummaryReportResultView()
         {
             InitializeComponent();
         }
@@ -142,7 +148,7 @@ namespace DamageAssessmentSummary
         public bool Configure(Window owner, IList<DataSource> dataSources)
         {
             // Show the configuration dialog.
-            Config.DamageAssessmentSummaryResultViewDialog dialog = new Config.DamageAssessmentSummaryResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, Expressions, FieldNameAliasMap, NewFields) { Owner = owner };
+            Config.ConfigureSummaryReportResultViewDialog dialog = new Config.ConfigureSummaryReportResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, Expressions, FieldNameAliasMap, NewFields, UseAliasName, AllSelected) { Owner = owner };
             if (dialog.ShowDialog() != true)
                 return false;
 
@@ -153,6 +159,8 @@ namespace DamageAssessmentSummary
             WhereClause = dialog.activeWhereClause;
             FieldNameAliasMap = dialog.FieldNameAliasMap;
             NewFields = dialog.NoteFields;
+            UseAliasName = dialog.UseAliasNameSelected;
+            AllSelected = dialog.AllSelected;
 
             mapWidget = dialog.mapWidget;
 
@@ -213,19 +221,19 @@ namespace DamageAssessmentSummary
         {
             //keep the inital view and the new view in sync
             bool synced = false;
-            DamageAssessmentSummaryResultView loadedView = null;
+            ConfigureSummaryReportResultView loadedView = null;
 
-            IList<DamageAssessmentSummaryResultView> newViews = new List<DamageAssessmentSummaryResultView>();
+            IList<ConfigureSummaryReportResultView> newViews = new List<ConfigureSummaryReportResultView>();
 
             foreach (var item in OperationsDashboard.Instance.Widgets)
             {
-                if (item is DamageAssessmentSummaryResultView)
+                if (item is ConfigureSummaryReportResultView)
                 {
-                    if (((DamageAssessmentSummaryResultView)item).lvSiteDetails.Items.Count > 0)
-                        loadedView = (DamageAssessmentSummaryResultView)item;
+                    if (((ConfigureSummaryReportResultView)item).lvSiteDetails.Items.Count > 0)
+                        loadedView = (ConfigureSummaryReportResultView)item;
 
-                    if (((DamageAssessmentSummaryResultView)item).lvSiteDetails.Items.Count == 0)
-                        newViews.Add((DamageAssessmentSummaryResultView)item);
+                    if (((ConfigureSummaryReportResultView)item).lvSiteDetails.Items.Count == 0)
+                        newViews.Add((ConfigureSummaryReportResultView)item);
                 }
             }
 

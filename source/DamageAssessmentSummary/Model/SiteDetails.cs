@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DamageAssessmentSummary.Model
+namespace ConfigureSummaryReport.Model
 {
     /// <summary>
     /// class used to store the values from the features that are passed to the list

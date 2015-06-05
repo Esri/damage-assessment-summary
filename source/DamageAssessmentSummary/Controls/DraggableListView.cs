@@ -9,9 +9,9 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using DamageAssessmentSummary.Model;
+using ConfigureSummaryReport.Model;
 
-namespace DamageAssessmentSummary.Controls
+namespace ConfigureSummaryReport.Controls
 {
     public class DraggableListView : ListView
     {

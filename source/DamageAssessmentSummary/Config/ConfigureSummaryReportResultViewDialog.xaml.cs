@@ -14,14 +14,14 @@ using System.Collections;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Globalization;
-using DamageAssessmentSummary.Model;
+using ConfigureSummaryReport.Model;
 
-namespace DamageAssessmentSummary.Config
+namespace ConfigureSummaryReport.Config
 {
     /// <summary>
     /// Interaction logic for ConfigureSummaryResultViewDialog.xaml
     /// </summary>
-    public partial class DamageAssessmentSummaryResultViewDialog : Window
+    public partial class ConfigureSummaryReportResultViewDialog : Window
     {
         public DataSource DataSource { get; private set; }
         public string activeWhereClause {get; private set;}
@@ -31,17 +31,20 @@ namespace DamageAssessmentSummary.Config
         public ObservableCollection<Model.Expression> expressions;
         public ObservableCollection<StringItems2> FieldNameAliasMap { get; private set; }
         public IDictionary<string, string> AdditionalFieldNames { get; private set; }
+        public bool AllSelected { get; private set; }
+        public bool UseAliasNameSelected { get; private set; }
 
         #region Dialog
 
-        public DamageAssessmentSummaryResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, ObservableCollection<Model.Expression> Expressions, ObservableCollection<StringItems2> SelectFieldList, ObservableCollection<NewField> noteFields)
+        public ConfigureSummaryReportResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, ObservableCollection<Model.Expression> Expressions, ObservableCollection<StringItems2> SelectFieldList, ObservableCollection<NewField> noteFields, bool useAliasName, bool allSelected)
         {
             InitializeComponent();
 
             //these will rehydrate state of the UI
             InitializeExpressions(Expressions);
-            InitializeFieldList(SelectFieldList);
+            InitializeFieldList(SelectFieldList, useAliasName, allSelected);
             InitializeNoteFields(noteFields);
+            
 
             // When re-configuring, initialize the widget config dialog from the existing settings.
             CaptionTextBox.Text = initialCaption;
@@ -122,6 +125,8 @@ namespace DamageAssessmentSummary.Config
             expressions = filterControl.expressions;
 
             List<StringItems2> displayItems = fieldListControl.getDisplayItems();
+            AllSelected = fieldListControl.chkBoxSelectAll.IsChecked.Value;
+            UseAliasNameSelected = fieldListControl.chkBoxUseAliasName.IsChecked.Value;
 
             if (displayItems.Count > 0)
             {
@@ -154,13 +159,18 @@ namespace DamageAssessmentSummary.Config
             noteFieldControl.InitializeNoteFields(noteFields);
         }
 
-        private void InitializeFieldList(ObservableCollection<StringItems2> SelectFieldList)
+        private void InitializeFieldList(ObservableCollection<StringItems2> SelectFieldList, bool useAliasNameValue, bool selectAll)
         {
+            AllSelected = selectAll;
+            UseAliasNameSelected = useAliasNameValue;
+
             FieldNameAliasMap = SelectFieldList;
             if (FieldNameAliasMap != null)
             {
                 filterControl.FieldNameAliasMap = FieldNameAliasMap;
                 fieldListControl.FieldNameAliasMap = FieldNameAliasMap;
+                fieldListControl.chkBoxSelectAll.IsChecked = AllSelected;
+                fieldListControl.chkBoxUseAliasName.IsChecked = UseAliasNameSelected;
             }
         }
 
