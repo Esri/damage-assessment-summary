@@ -8,48 +8,6 @@
         SizeToContent="WidthAndHeight"
         Title="Configure Summary Report"
         xmlns:controls="clr-namespace:ConfigureSummaryReport.Controls">
-    <Window.Resources>
-        <!--<DataTemplate x:Key="chkBoxItemDataTemplate">
-            <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="chkBox" 
-                          Content="{Binding Path=value[0]}" 
-                          MinWidth="200"/>
-                <StackPanel Orientation="Horizontal">
-                    <local:ClickSelectTextBox x:Name="fieldName" 
-                                          Text="{Binding Path=key, Mode=OneWay}" 
-                                          MinWidth="200" IsEnabled="False" 
-                                              TextChanged="fieldName_TextChanged"/>
-                    <CheckBox x:Name="modifyField" 
-                          Content="Modify" 
-                              IsEnabled="False">
-                    </CheckBox>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>-->
-        <!--<DataTemplate x:Key="chkBoxItemDataTemplate">
-            <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="chkBox" 
-                          Content="{Binding Path=value[0]}" 
-                          MinWidth="200"
-                          IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"/>
-                <StackPanel Orientation="Horizontal">
-                    <local:ClickSelectTextBox x:Name="fieldName" 
-                                          Text="{Binding Path=key, Mode=OneWay}" 
-                                          MinWidth="200" IsEnabled="False" 
-                                              TextChanged="fieldName_TextChanged"/>
-                    <CheckBox x:Name="modifyField" 
-                          Content="Modify" 
-                              IsEnabled="False">
-                    </CheckBox>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>-->
-
-        <!--<d:CountConverter x:Key="CountToVisibilityConverter" />-->
-        <!--<d:BoolToVisibilityConverter x:Key="boolToVisibilityConverter"/>-->
-        <!--<d:testConverter x:Key="tc"/>-->
-        
-    </Window.Resources>
     <Grid Margin="2,2,2,0" Height="auto" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -133,7 +91,7 @@
                                 <TextBlock Text="Select Display Fields"/>
                             </Expander.Header>
                             <Expander.Content>
-                                <controls:FieldListControl x:Name="fieldListControl"/>
+                                <controls:FieldListControl x:Name="fieldListControl" MaxHeight="700"/>
                             </Expander.Content>
                         </Expander>
                         <Expander ScrollViewer.CanContentScroll="True" 
