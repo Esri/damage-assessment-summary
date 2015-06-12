@@ -250,10 +250,12 @@ namespace ConfigureSummaryReport
                 }
             }
 
+            //TODO changed this to support working with the selected layer...would delete note field itesm
             //if no new view but the current view has items (standard refersh calls) set synced flag to true to
             // to avoid another query of the data thus overwriting values the user has changed
-            if (newViews.Count == 0 && loadedView.lvSiteDetails.Items.Count > 0)
-                synced = true;
+            if(!dataSource.IsSelectable)
+                if (newViews.Count == 0 && loadedView.lvSiteDetails.Items.Count > 0)
+                    synced = true;
 
             return synced;
         }

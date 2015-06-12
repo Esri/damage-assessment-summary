@@ -60,45 +60,52 @@ namespace ConfigureSummaryReport.Model
         {
             get 
             {
-                string formatString = "{0} {1} {2}";
-
-                //Currently only special handeling for String fields   
-                switch (this.FieldType)
+                if (advancedExpression == null)
                 {
-                    case fieldType.Blob:
-                        break;
-                    case fieldType.Date:
-                        break;
-                    case fieldType.Double:
-                        break;
-                    case fieldType.GUID:
-                        break;
-                    case fieldType.Geometry:
-                        break;
-                    case fieldType.GlobalID:
-                        break;
-                    case fieldType.Integer:
-                        break;
-                    case fieldType.OID:
-                        break;
-                    case fieldType.Raster:
-                        break;
-                    case fieldType.Single:
-                        break;
-                    case fieldType.SmallInteger:
-                        break;
-                    case fieldType.String:
-                        formatString = "{0} {1} '{2}'";
-                        break;
-                    case fieldType.Unknown:
-                        break;
-                    case fieldType.XML:
-                        break;
-                    default:
-                        break;
+                    string formatString = "{0} {1} {2}";
+
+                    //Currently only special handeling for String fields   
+                    switch (this.FieldType)
+                    {
+                        case fieldType.Blob:
+                            break;
+                        case fieldType.Date:
+                            break;
+                        case fieldType.Double:
+                            break;
+                        case fieldType.GUID:
+                            break;
+                        case fieldType.Geometry:
+                            break;
+                        case fieldType.GlobalID:
+                            break;
+                        case fieldType.Integer:
+                            break;
+                        case fieldType.OID:
+                            break;
+                        case fieldType.Raster:
+                            break;
+                        case fieldType.Single:
+                            break;
+                        case fieldType.SmallInteger:
+                            break;
+                        case fieldType.String:
+                            formatString = "{0} {1} '{2}'";
+                            break;
+                        case fieldType.Unknown:
+                            break;
+                        case fieldType.XML:
+                            break;
+                        default:
+                            break;
+                    }
+
+                    return String.Format(formatString, fieldName, getOperatorFromString(op), value);
                 }
-                
-                return String.Format(formatString, fieldName, getOperatorFromString(op), value);
+                else 
+                {
+                    return advancedExpression;
+                }
             }
             set { _expression = value; }
         }

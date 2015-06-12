@@ -7,7 +7,37 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <DataTemplate x:Key="AdditionalFieldsDataTemplate">
-            <Grid>
+            <!--TEST-->
+            <!--<Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=""/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding Path=key}" 
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           HorizontalAlignment="Stretch"
+                           Margin="1,1,1,1"
+                           Style="{StaticResource ThemedTextBlockStyle}" 
+                           Foreground="{DynamicResource ThemedForegroundBrush}" 
+                           FontSize="{DynamicResource ThemedTextSize}" />
+                <TextBox Text="{Binding Path=value}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"  
+                         Grid.Row="1"
+                         Grid.Column="1"
+                         HorizontalAlignment="Stretch"
+                         Margin="1,1,1,1"
+                         Style="{StaticResource ThemedTextBoxStyle}" 
+                         Foreground="{DynamicResource ThemedForegroundBrush}" 
+                         FontSize="{DynamicResource ThemedTextSize}" />
+            </Grid>-->
+            
+            <!--ORG-->
+            <!--<Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="99" Width="auto"/>
                     <ColumnDefinition MinWidth="170" Width="*"/>
@@ -24,6 +54,34 @@
                          MinWidth="100" 
                          Grid.Column="1"
                          Margin="0,10,10,0"
+                         Style="{StaticResource ThemedTextBoxStyle}" 
+                         Foreground="{DynamicResource ThemedForegroundBrush}" 
+                         FontSize="{DynamicResource ThemedTextSize}" />
+            </Grid>-->
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Text="{Binding Path=key}" 
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="10,2,10,0"
+                           Style="{StaticResource ThemedTextBlockStyle}" 
+                           Foreground="{DynamicResource ThemedForegroundBrush}" 
+                           FontSize="{DynamicResource ThemedTextSize}" />
+                <TextBox Text="{Binding Path=value}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap" 
+                         MinWidth="250" 
+                         Grid.Row="1"
+                         Grid.Column="0"
+                         Margin="10,2,10,5"
                          Style="{StaticResource ThemedTextBoxStyle}" 
                          Foreground="{DynamicResource ThemedForegroundBrush}" 
                          FontSize="{DynamicResource ThemedTextSize}" />
@@ -44,24 +102,22 @@
                 <Expander.Content>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                    <ItemsControl x:Name="lvAdditionalFields" 
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="300">
+                            <ItemsControl x:Name="lvAdditionalFields" 
                                   ItemsSource="{Binding Path=AdditionalFieldsAndValues}" 
-                                  ItemTemplate="{StaticResource AdditionalFieldsDataTemplate}" 
-                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                  ScrollViewer.CanContentScroll="True" 
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ItemTemplate="{StaticResource AdditionalFieldsDataTemplate}"      
                                   Grid.Row="0"
                                   Background="{DynamicResource ThemedBackgroundBrush}" 
                                   Foreground="{DynamicResource ThemedForegroundBrush}" 
                                   FontSize="{DynamicResource ThemedTextSize}">
-                    </ItemsControl>
+                        </ItemsControl>
+                        </ScrollViewer>
                         <Button x:Name="ZoomToFeature" 
                                 Content="Zoom To Feature" 
                                 Width="100" 
-                                Height="auto" 
                                 Grid.Row="1"
                                 Click="ZoomToFeature_Click"
                                 Margin="5"

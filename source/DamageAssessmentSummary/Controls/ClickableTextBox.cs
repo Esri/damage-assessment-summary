@@ -57,14 +57,26 @@ namespace ConfigureSummaryReport.Controls
 
             while (parent != null && !(parent is ListView))
                 parent = VisualTreeHelper.GetParent(parent);
-
+           
             if (parent != null)
             {
                 var lv = (ListView)parent;
 
                 if (lv.SelectedIndex == lv.Items.Count - 1)
                 {
-                    NewField nf = new NewField("New Note Field Name");
+                    if (child is ClickableTextBox)
+                    {
+                        ((ClickableTextBox)child).FontStyle = FontStyles.Normal;
+                        DependencyObject p = VisualTreeHelper.GetParent(child);
+                        if(p is StackPanel)
+                            foreach (var c in ((StackPanel)p).Children)
+                            {
+                                if (c is CheckBox)
+                                    ((CheckBox)c).IsEnabled = true;
+                            }     
+                    }
+
+                    NewField nf = new NewField("Note Field Name");
                     ObservableCollection<NewField> source = lv.ItemsSource as ObservableCollection<NewField>;
                     source.Add(nf);
                 }

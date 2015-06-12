@@ -40,6 +40,22 @@ namespace ConfigureSummaryReport.Config
         {
             InitializeComponent();
 
+            double left = (Application.Current.MainWindow.ActualWidth - 600) / 2;
+            if (left != ((SystemParameters.MaximizedPrimaryScreenWidth - 600) / 2))
+                left = (Application.Current.MainWindow.ActualWidth - 600) / 2 + (SystemParameters.VirtualScreenWidth - Application.Current.MainWindow.ActualWidth);
+            if (left < Application.Current.MainWindow.Left)
+            {
+                //Just in case I did not think through this correctly
+                this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            }
+            else
+            {
+                this.Left = left;
+                this.Top = 60;
+            }
+
+
+
             //these will rehydrate state of the UI
             InitializeExpressions(Expressions);
             InitializeFieldList(SelectFieldList, useAliasName, allSelected);
@@ -75,6 +91,7 @@ namespace ConfigureSummaryReport.Config
                     mapWidget = currentWidget;
             }
         }
+
         /// <summary>
         /// Update the UI when the selected datasource changes
         /// </summary>
@@ -96,7 +113,8 @@ namespace ConfigureSummaryReport.Config
 
                 fieldListControl.FieldNameAliasMap = FieldNameAliasMap;
             }
-
+            //filterControl.UseAliasNameSelected = UseAliasNameSelected;
+            //filterControl.NoteFields = NoteFields;
             filterControl.FieldNameAliasMap = FieldNameAliasMap;
             filterControl.dataSource = dataSource;
         }
@@ -118,6 +136,8 @@ namespace ConfigureSummaryReport.Config
         /// </summary>
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
+            filterControl.validateOnOk();
+
             DataSource = DataSourceSelector.SelectedDataSource;
             Caption = CaptionTextBox.Text;
             activeWhereClause = filterControl.ActiveWhereClause;
@@ -135,7 +155,7 @@ namespace ConfigureSummaryReport.Config
                 //Add any note fields that don't have the default name
                 foreach (NewField item in NoteFields)
                 {
-                    if (item.Name != "New Note Field Name")
+                    if (item.Name != "Note Field Name")
                         AdditionalFieldNames.Add(item.Name, item.Name);
                 }
 

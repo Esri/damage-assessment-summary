@@ -4,8 +4,10 @@
         xmlns:opsDash="clr-namespace:ESRI.ArcGIS.OperationsDashboard;assembly=ESRI.ArcGIS.OperationsDashboard"
         xmlns:opsDashCtl="clr-namespace:ESRI.ArcGIS.OperationsDashboard.Controls;assembly=ESRI.ArcGIS.OperationsDashboard"
         xmlns:d="clr-namespace:ConfigureSummaryReport"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="Manual"
         SizeToContent="WidthAndHeight"
+        MinWidth="610"
+        MinHeight="380"
         Title="Configure Summary Report"
         xmlns:controls="clr-namespace:ConfigureSummaryReport.Controls">
     <Grid Margin="2,2,2,0" Height="auto" VerticalAlignment="Top">
@@ -91,7 +93,7 @@
                                 <TextBlock Text="Select Display Fields"/>
                             </Expander.Header>
                             <Expander.Content>
-                                <controls:FieldListControl x:Name="fieldListControl" MaxHeight="700"/>
+                                <controls:FieldListControl x:Name="fieldListControl" MaxHeight="300"/>
                             </Expander.Content>
                         </Expander>
                         <Expander ScrollViewer.CanContentScroll="True" 

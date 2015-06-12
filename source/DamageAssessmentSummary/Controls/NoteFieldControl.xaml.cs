@@ -37,7 +37,7 @@ namespace ConfigureSummaryReport.Controls
                 // resetting the state after a save and reopen
                 //setting up a default for init
                 if (_NewFields == null)
-                    _NewFields = new ObservableCollection<NewField>() { new NewField("New Note Field Name") };
+                    _NewFields = new ObservableCollection<NewField>() { new NewField("Note Field Name") };
 
                 return _NewFields;
             }
@@ -56,7 +56,7 @@ namespace ConfigureSummaryReport.Controls
         private void removeField_Checked(object sender, RoutedEventArgs e)
         {
             ObservableCollection<NewField> fields = (ObservableCollection<NewField>)lvNewFields.ItemsSource;
-            fields.RemoveAt(lvNewFields.SelectedIndex);
+            fields.RemoveAt(lvNewFields.SelectedIndex);          
         }
     }
 }

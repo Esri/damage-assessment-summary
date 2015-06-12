@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ConfigureSummaryReport.Model;
+//using ConfigureSummaryReport.Config;
 
 namespace ConfigureSummaryReport.Controls
 {
@@ -24,6 +25,9 @@ namespace ConfigureSummaryReport.Controls
     public partial class FilterControl : UserControl
     {
         private ObservableCollection<StringItems2> _FieldNameAliasMap;
+
+        //private ObservableCollection<NewField> _NoteFields;
+
         private string _ActiveWhereClause;
 
         public FilterControl()
@@ -41,6 +45,18 @@ namespace ConfigureSummaryReport.Controls
                 _FieldNameAliasMap = value;
             } 
         }
+        //public ObservableCollection<NewField> NoteFields
+        //{
+        //    get { return _NoteFields; }
+        //    set { _NoteFields = value; }
+        //}
+
+        //public bool UseAliasNameSelected
+        //{
+        //    get;
+        //    set;
+        //}
+
         public string ActiveWhereClause 
         {
             get
@@ -100,33 +116,58 @@ namespace ConfigureSummaryReport.Controls
 
         private void btnAddExpression_Click(object sender, RoutedEventArgs e)
         {
-            string fieldName = cboFieldNames.SelectedValue as string;
-            string op = cboOperators.SelectedValue as string;
-            string value = txtSimpleExpression.Text;
+            //get the actual field name from the map here
+            string fieldName = "";
+            Model.Expression.fieldType ft = Model.Expression.fieldType.Unknown;
 
-            Model.Expression exp = new Model.Expression(fieldName, op, value);
-
-            foreach (StringItems2 item in FieldNameAliasMap)
+            if (cboFieldNames.SelectedValue.ToString() == _FieldNameAliasMap[cboFieldNames.SelectedIndex].value[0])
             {
-                if (item.value[0] == fieldName)
+                fieldName = _FieldNameAliasMap[cboFieldNames.SelectedIndex].key;
+                ft = _FieldNameAliasMap[cboFieldNames.SelectedIndex].FieldType;
+            }
+            else
+            {
+                for (int i = 0; i < cboFieldNames.Items.Count; i++)
                 {
-                    exp.FieldType = item.FieldType;
-                    break;
+                    if (_FieldNameAliasMap[i].value[0] == cboFieldNames.SelectedValue.ToString())
+                    {
+                        fieldName = _FieldNameAliasMap[i].key;
+                        ft = _FieldNameAliasMap[i].FieldType;
+                    }
                 }
             }
 
-            if (expressions == null)
-            {
-                expressions = new ObservableCollection<Model.Expression>();
-                lvExpressions.ItemsSource = expressions;
-                //TODO...may want to clean this up between when the diag is opened and closed
-                expressions.CollectionChanged += expressions_CollectionChanged;
-            }
+            string op = cboOperators.SelectedValue as string;
+            string value = txtSimpleExpression.Text;
 
-            expressions.Add(exp);
+            bool validValue = validateValue(ft, value);
 
-            if (lvExpressions.Visibility == System.Windows.Visibility.Hidden)
-                lvExpressions.Visibility = System.Windows.Visibility.Visible;
+            if(validValue)
+            { 
+                Model.Expression exp = new Model.Expression(fieldName, op, value);
+
+                foreach (StringItems2 item in FieldNameAliasMap)
+                {
+                    if (item.key == fieldName)
+                    {
+                        exp.FieldType = item.FieldType;
+                        break;
+                    }
+                }
+
+                if (expressions == null)
+                {
+                    expressions = new ObservableCollection<Model.Expression>();
+                    lvExpressions.ItemsSource = expressions;
+                    //TODO...may want to clean this up between when the diag is opened and closed
+                    expressions.CollectionChanged += expressions_CollectionChanged;
+                }
+
+                expressions.Add(exp);
+
+                if (lvExpressions.Visibility == System.Windows.Visibility.Hidden)
+                    lvExpressions.Visibility = System.Windows.Visibility.Visible;
+            }     
         }
 
         private void btnRemove_Click(object sender, RoutedEventArgs e)
@@ -151,6 +192,102 @@ namespace ConfigureSummaryReport.Controls
             }
         }
 
+        //returns true for any fields that query is supported on for this addin
+        private bool validateValue(Model.Expression.fieldType ft, string value)
+        {
+            switch (ft)
+            {
+                case Model.Expression.fieldType.Blob:
+                    MessageBox.Show("Query not supported on BLOB field type.");
+                    return false;
+                case Model.Expression.fieldType.Date:
+                    DateTime dt;
+                    if (DateTime.TryParse(value, out dt))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for Date field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.Double:
+                    Double d;
+                    if (Double.TryParse(value, out d))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for Double field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.GUID:
+                    Guid g;
+                    if (Guid.TryParse(value, out g))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for GUID field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.Geometry:
+                    MessageBox.Show("Query not supported on GEOMETRY field type.");
+                    return false;
+                case Model.Expression.fieldType.GlobalID:
+                    Guid guid;
+                    if (Guid.TryParse(value, out guid))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for GlobalID field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.Integer:
+                    Int32 i;
+                    if (Int32.TryParse(value, out i))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for Integer field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.OID:
+                    Int32 oid;
+                    if (Int32.TryParse(value, out oid))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for OID field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.Raster:
+                    MessageBox.Show("Query not supported on RASTER field type.");
+                    return false;
+                case Model.Expression.fieldType.Single:
+                    Int16 ii;
+                    if (Int16.TryParse(value, out ii))
+                        return true;
+                    else
+                    {
+                        MessageBox.Show("Cannot add Expression.\nUnable to parse value: " + value + " for Single Integer field type.");
+                        return false;
+                    }
+                case Model.Expression.fieldType.SmallInteger:
+                    Int16 iii;
+                    if (Int16.TryParse(value, out iii))
+                        return true;
+                    else
+                        return false;
+                case Model.Expression.fieldType.String:
+                    return true;
+                case Model.Expression.fieldType.Unknown:
+                    MessageBox.Show("Query not supported on UNKNOWN field type.");
+                    return false;
+                case Model.Expression.fieldType.XML:
+                    MessageBox.Show("Query not supported on XML field type.");
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
         private void validateExpression_Click(object sender, RoutedEventArgs e)
         {
             if (lvExpressions.Items.Count > 0)
@@ -160,12 +297,59 @@ namespace ConfigureSummaryReport.Controls
                 Query q = new Query(ActiveWhereClause);
 
                 validateExpression(q);
+
+                OperationsDashboard.Instance.RefreshDataSource(dataSource);
             }
             else
             {
                 MessageBox.Show("No expression to validate.\nPlease add an expression.");
             }
 
+        }
+        private bool hasErrors = false;
+        public void validateOnOk()
+        {
+            if (lvExpressions.Items.Count > 0)
+            {
+                //validate each expression indivually so we could know 
+                // the bad parts to remove
+                foreach (Model.Expression item in lvExpressions.ItemsSource)
+                {
+                    Query q = new Query(item.expression);
+                    finalValidation(q, item);
+                }
+
+                setActiveWhereClause();
+
+
+                if (hasErrors)
+                {
+                    MessageBox.Show("Removed invalid expression(s).");
+                    hasErrors = false;
+                }
+            }
+        }
+
+        private async void finalValidation(Query q, Model.Expression e)
+        {
+            try
+            {
+                var qr = await dataSource.ExecuteQueryAsync(q);
+                if (qr.Error != null)
+                {
+                    hasErrors = true;
+                    expressions.Remove(e);
+
+                    if (expressions.Count == 0)
+                        lvExpressions.Visibility = System.Windows.Visibility.Hidden;
+                }
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private async void validateExpression(Query q)
@@ -176,7 +360,9 @@ namespace ConfigureSummaryReport.Controls
 
                 if (qr.Error != null)
                 {
+                    OperationsDashboard.Instance.RefreshDataSource(dataSource);
                     MessageBox.Show(qr.Error.Message);
+                    validateOnOk();
                     return;
                 }
 

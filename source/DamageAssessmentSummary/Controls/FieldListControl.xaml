@@ -35,6 +35,7 @@
         </Style>
         <local:BoolConverter x:Key="convBool"/>
     </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
     <Grid>
         <GroupBox Grid.Row="1" Grid.ColumnSpan="2">
             <StackPanel Grid.ColumnSpan="2" 
@@ -54,7 +55,7 @@
                 <controls:DraggableListView x:Name="chkBoxListView" 
                                             SelectionMode="Single" 
                                             ItemContainerStyle="{StaticResource ItemContStyle}"
-                                            MaxHeight="500"
+                                            MaxHeight="450"
                                             Grid.ColumnSpan="2" 
                                             Cursor="Hand" 
                                             ToolTip="Drag items to control result list order">
@@ -115,4 +116,5 @@
             </StackPanel>
         </GroupBox>
     </Grid>
+    </ScrollViewer>
 </UserControl>

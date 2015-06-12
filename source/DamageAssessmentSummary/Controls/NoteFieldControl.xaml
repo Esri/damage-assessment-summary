@@ -6,14 +6,24 @@
              xmlns:local="clr-namespace:ConfigureSummaryReport"
              xmlns:controls="clr-namespace:ConfigureSummaryReport.Controls">
     <UserControl.Resources>
+        <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="DarkGreen"/>-->
         <DataTemplate x:Key="newFieldItemDataTemplate">
+            <!--<DataTemplate.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="DarkGreen"/>
+            </DataTemplate.Resources>-->
             <StackPanel Orientation="Horizontal">
+                <!--<StackPanel.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="DarkGreen"/>
+                </StackPanel.Resources>-->
                 <controls:ClickableTextBox x:Name="fieldName" 
                                         Text="{Binding Path=Name}" 
-                                        MinWidth="200" />
+                                        MinWidth="200" FontStyle="Italic"/>
                 <CheckBox x:Name="removeField" 
                           Content="Remove" 
-                          CheckBox.Checked="removeField_Checked">
+                          CheckBox.Checked="removeField_Checked" IsEnabled="False">
                 </CheckBox>
             </StackPanel>
         </DataTemplate>
@@ -22,9 +32,10 @@
             <Style.Triggers>
                 <Trigger Property="IsKeyboardFocusWithin" 
                          Value="True">
-                    <Setter Property="IsSelected" 
-                            Value="True" />
-                </Trigger>
+                    <Setter Property="IsSelected" Value="True" />
+                    <!--<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}}"/>-->
+                    </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
@@ -43,6 +54,10 @@
                   ScrollViewer.CanContentScroll="True"                
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"              
                   ItemContainerStyle="{StaticResource lvStyle}">
+            <!--<ListView.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="DarkGreen"/>
+            </ListView.Resources>-->
         </ListView>
     </Grid>
 </UserControl>
