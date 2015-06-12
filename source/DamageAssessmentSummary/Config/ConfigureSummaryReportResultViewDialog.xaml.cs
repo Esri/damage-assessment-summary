@@ -43,7 +43,9 @@ namespace ConfigureSummaryReport.Config
             double left = (Application.Current.MainWindow.ActualWidth - 600) / 2;
             if (left != ((SystemParameters.MaximizedPrimaryScreenWidth - 600) / 2))
                 left = (Application.Current.MainWindow.ActualWidth - 600) / 2 + (SystemParameters.VirtualScreenWidth - Application.Current.MainWindow.ActualWidth);
-            if (left < Application.Current.MainWindow.Left)
+
+            double mainWinWidth = Application.Current.MainWindow.ActualWidth;
+            if (mainWinWidth < SystemParameters.MaximizedPrimaryScreenWidth || mainWinWidth < (SystemParameters.VirtualScreenWidth - SystemParameters.MaximizedPrimaryScreenWidth))
             {
                 //Just in case I did not think through this correctly
                 this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
@@ -51,16 +53,13 @@ namespace ConfigureSummaryReport.Config
             else
             {
                 this.Left = left;
-                this.Top = 60;
+                this.Top = 80;
             }
-
-
 
             //these will rehydrate state of the UI
             InitializeExpressions(Expressions);
             InitializeFieldList(SelectFieldList, useAliasName, allSelected);
             InitializeNoteFields(noteFields);
-            
 
             // When re-configuring, initialize the widget config dialog from the existing settings.
             CaptionTextBox.Text = initialCaption;

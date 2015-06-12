@@ -23,5 +23,9 @@ namespace ConfigureSummaryReport.Model
 
         [DataMember]
         public IList<StringItems> AdditionalFieldsAndValues { get; set; }
+
+        [DataMember]
+        public string f { get; set; }
+
     }
 }

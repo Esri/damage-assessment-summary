@@ -115,13 +115,22 @@
                                   FontSize="{DynamicResource ThemedTextSize}">
                         </ItemsControl>
                         </ScrollViewer>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
                         <Button x:Name="ZoomToFeature" 
                                 Content="Zoom To Feature" 
                                 Width="100" 
                                 Grid.Row="1"
                                 Click="ZoomToFeature_Click"
-                                Margin="5"
+                                Margin="5,5,5,5"
                                 Style= "{StaticResource ThemedButtonStyle}"/>
+                            <Button x:Name="HighlightFeature" 
+                                Content="Select Feature" 
+                                Width="100" 
+                                Grid.Row="1"
+                                Click="HighlightFeature_Click"
+                                Margin="5,5,5,5"
+                                Style= "{StaticResource ThemedButtonStyle}"/>
+                        </StackPanel>
                     </Grid>
                 </Expander.Content>
             </Expander>

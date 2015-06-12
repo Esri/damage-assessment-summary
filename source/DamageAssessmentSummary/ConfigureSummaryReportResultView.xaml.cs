@@ -39,7 +39,7 @@ namespace ConfigureSummaryReport
         public string DataSourceId { get; set; }
 
         [DataMember(Name = "_dataSource")]
-        private DataSource dataSource = null;
+        private ESRI.ArcGIS.OperationsDashboard.DataSource dataSource = null;
 
         [DataMember(Name = "mapWidget")]
         private MapWidget mapWidget = null;
@@ -206,8 +206,9 @@ namespace ConfigureSummaryReport
         /// Called when a DataSource found in the DataSourceIds property is updated.
         /// </summary>
         /// <param name="dataSource">The DataSource being updated.</param>
-        public void OnRefresh(DataSource dataSource)
+        public void OnRefresh(DataSource ds)
         {
+            dataSource = ds;
             //If a new instance of this view is opened....pass the items from the original view to the new view
             // otherwise do a standard query to the data
             if (!syncViews())
@@ -253,11 +254,19 @@ namespace ConfigureSummaryReport
             //TODO changed this to support working with the selected layer...would delete note field itesm
             //if no new view but the current view has items (standard refersh calls) set synced flag to true to
             // to avoid another query of the data thus overwriting values the user has changed
-            if(!dataSource.IsSelectable)
+            if (dataSource != null)
+            {
+                if (!dataSource.IsSelectable)
+                    if (newViews.Count == 0 && loadedView.lvSiteDetails.Items.Count > 0)
+                        synced = true;
+            }
+            else
+            {
                 if (newViews.Count == 0 && loadedView.lvSiteDetails.Items.Count > 0)
                     synced = true;
+            }
 
-            return synced;
+                return synced;
         }
 
         /// <summary>
@@ -267,7 +276,7 @@ namespace ConfigureSummaryReport
         {
             //query/return all features
             var result = await ds.ExecuteQueryAsync(new Query(WhereClause, null, true));
-
+           
             //Create a list to store the returned results
             List<SiteDetails> items = new List<SiteDetails>();
 
@@ -283,6 +292,7 @@ namespace ConfigureSummaryReport
                         // that way it only happens once rather than on each zoom
                         items.Add(new SiteDetails()
                         {
+                            f = item.Attributes[ds.ObjectIdFieldName].ToString(),
                             ZoomExtent = item.Geometry.ToJson(),
                             AdditionalFieldsAndValues = createNewFieldList(item),
                             LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : ""
@@ -352,7 +362,9 @@ namespace ConfigureSummaryReport
                     if (g is MapPoint)
                         map.ZoomToResolution(map.MinimumResolution, (MapPoint)g);
                     else
-                        map.ZoomTo(g);
+                    {
+                        map.ZoomTo(g.Extent.Expand(1.23));
+                    }
                 }
             }
             catch (Exception ex)
@@ -449,5 +461,23 @@ namespace ConfigureSummaryReport
         }
 
         #endregion
+
+        private void HighlightFeature_Click(object sender, RoutedEventArgs e)
+        {
+            Geometry g = Geometry.FromJson(((SiteDetails)((Button)sender).DataContext).ZoomExtent);
+
+            ESRI.ArcGIS.Client.FeatureLayer fl = mapWidget.FindFeatureLayer(dataSource);
+
+            for (int i = 0; i < fl.Graphics.Count; i++)
+            {
+                client.Graphic feature = fl.Graphics[i];
+                int featureOid;
+                int.TryParse(feature.Attributes[dataSource.ObjectIdFieldName].ToString(), out featureOid);
+                if (((SiteDetails)((Button)sender).DataContext).f == featureOid.ToString())
+                {
+                    feature.Select();
+                }
+            }
+        }
     }
 }
