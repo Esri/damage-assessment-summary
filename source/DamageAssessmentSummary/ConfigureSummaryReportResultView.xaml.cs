@@ -290,23 +290,59 @@ namespace ConfigureSummaryReport
                     {
                         //TODO thinking I should just handle the projections here
                         // that way it only happens once rather than on each zoom
-                        items.Add(new SiteDetails()
+                        SiteDetails newItem = new SiteDetails()
                         {
                             f = item.Attributes[ds.ObjectIdFieldName].ToString(),
                             ZoomExtent = item.Geometry.ToJson(),
                             AdditionalFieldsAndValues = createNewFieldList(item),
                             LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : ""
-                        });
+                        };
+
+                        if(ds.IsSelectable)
+                            newItem.isExpanded = isItemExpanded(newItem);
+
+                        items.Add(newItem);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message);
+                        //MessageBox.Show(ex.Message);
                     }
                 }
             }
 
             //bind the items to the control
             lvSiteDetails.ItemsSource = items;
+        }
+
+        private bool isItemExpanded(SiteDetails sd)
+        {
+            try
+            {
+                for (int i = 0; i < lvSiteDetails.Items.Count; i++)
+                {
+                    bool isMatch = true;
+
+                    SiteDetails currentSD = (SiteDetails)lvSiteDetails.Items[i];
+                    int cnt = 3;
+                    if (currentSD.AdditionalFieldsAndValues.Count < 3)
+                        cnt = currentSD.AdditionalFieldsAndValues.Count;
+                    //only check the first couple of fields
+                    for (int ii = 0; ii < cnt; ii++)
+                    {
+                        //TODO..could be that they just edited the value
+                        if (currentSD.AdditionalFieldsAndValues[ii].value != sd.AdditionalFieldsAndValues[ii].value)
+                            isMatch = false;
+                    }
+
+                    if (isMatch)
+                        return currentSD.isExpanded;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -464,7 +500,9 @@ namespace ConfigureSummaryReport
 
         private void HighlightFeature_Click(object sender, RoutedEventArgs e)
         {
-            Geometry g = Geometry.FromJson(((SiteDetails)((Button)sender).DataContext).ZoomExtent);
+            SiteDetails sd = ((Button)sender).DataContext as SiteDetails;
+
+            Geometry g = Geometry.FromJson(sd.ZoomExtent);
 
             ESRI.ArcGIS.Client.FeatureLayer fl = mapWidget.FindFeatureLayer(dataSource);
 
@@ -473,11 +511,24 @@ namespace ConfigureSummaryReport
                 client.Graphic feature = fl.Graphics[i];
                 int featureOid;
                 int.TryParse(feature.Attributes[dataSource.ObjectIdFieldName].ToString(), out featureOid);
-                if (((SiteDetails)((Button)sender).DataContext).f == featureOid.ToString())
+                if (sd.f == featureOid.ToString())
                 {
+                    fl.ClearSelection();
                     feature.Select();
                 }
             }
+        }
+
+        private static T FindAnchestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
+                    return (T)current;
+                current = System.Windows.Media.VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
         }
     }
 }

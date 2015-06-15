@@ -27,5 +27,7 @@ namespace ConfigureSummaryReport.Model
         [DataMember]
         public string f { get; set; }
 
+        [DataMember]
+        public bool isExpanded { get; set; }
     }
 }

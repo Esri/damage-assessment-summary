@@ -93,7 +93,8 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       Background="{DynamicResource ThemedBackgroundBrush}" 
                       Foreground="{DynamicResource ThemedForegroundBrush}" 
-                      FontSize="{DynamicResource ThemedTextSize}">
+                      FontSize="{DynamicResource ThemedTextSize}"
+                      IsExpanded="{Binding Path=isExpanded}">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=LabelField}"/>
