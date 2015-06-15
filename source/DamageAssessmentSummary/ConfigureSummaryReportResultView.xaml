@@ -4,8 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:opsDash="clr-namespace:ESRI.ArcGIS.OperationsDashboard;assembly=ESRI.ArcGIS.OperationsDashboard"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             xmlns:local="clr-namespace:ConfigureSummaryReport">
     <UserControl.Resources>
+        <local:QueueDisplayDataTemplateSelector x:Key="QueueDisplayDataTemplateSelector"/>
+        
         <DataTemplate x:Key="AdditionalFieldsDataTemplate">
             <!--TEST-->
             <!--<Grid>
@@ -136,6 +139,44 @@
                 </Expander.Content>
             </Expander>
         </DataTemplate>
+
+        <DataTemplate x:Key="ExpanderTemplate2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="300" Background="{DynamicResource ThemedBackgroundBrush}" 
+                      Foreground="{DynamicResource ThemedForegroundBrush}" 
+                      FontSize="{DynamicResource ThemedTextSize}">
+                    <ItemsControl x:Name="lvAdditionalFields" 
+                                  ItemsSource="{Binding Path=AdditionalFieldsAndValues}" 
+                                  ItemTemplate="{StaticResource AdditionalFieldsDataTemplate}"      
+                                  Grid.Row="0"
+                                  Background="{DynamicResource ThemedBackgroundBrush}" 
+                                  Foreground="{DynamicResource ThemedForegroundBrush}" 
+                                  FontSize="{DynamicResource ThemedTextSize}">
+                    </ItemsControl>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+                    <Button x:Name="ZoomToFeature" 
+                                Content="Zoom To Feature" 
+                                Width="100" 
+                                Grid.Row="1"
+                                Click="ZoomToFeature_Click"
+                                Margin="5,5,5,5"
+                                Style= "{StaticResource ThemedButtonStyle}"/>
+                    <Button x:Name="HighlightFeature" 
+                                Content="Select Feature" 
+                                Width="100" 
+                                Grid.Row="1"
+                                Click="HighlightFeature_Click"
+                                Margin="5,5,5,5"
+                                Style= "{StaticResource ThemedButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
     </UserControl.Resources>
 
     <Grid Margin="2,2,2,2">
@@ -147,10 +188,19 @@
         <Grid Grid.Row="0"  
               ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
               Background="{DynamicResource ThemedBackgroundBrush}">
-            <ListView Name="lvSiteDetails" 
+            <!--<ListView Name="lvSiteDetails" 
                 ScrollViewer.CanContentScroll="True"  
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ItemTemplate="{StaticResource ExpanderTemplate}"
+                ItemContainerStyle="{StaticResource ThemedSeparatorLineNoSelectionNoHoverListBoxItemStyle}"
+                Background="{DynamicResource ThemedBackgroundBrush}" 
+                Foreground="{DynamicResource ThemedForegroundBrush}" 
+                FontSize="{DynamicResource ThemedTextSize}" >
+            </ListView>-->
+            <ListView Name="lvSiteDetails" 
+                ScrollViewer.CanContentScroll="True"  
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ItemTemplateSelector="{StaticResource QueueDisplayDataTemplateSelector}"
                 ItemContainerStyle="{StaticResource ThemedSeparatorLineNoSelectionNoHoverListBoxItemStyle}"
                 Background="{DynamicResource ThemedBackgroundBrush}" 
                 Foreground="{DynamicResource ThemedForegroundBrush}" 

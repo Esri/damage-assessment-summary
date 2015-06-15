@@ -66,6 +66,9 @@ namespace ConfigureSummaryReport
         [DataMember(Name = "allSelected")]
         private bool AllSelected { get; set; }
 
+        [DataMember(Name = "useExpandable")]
+        private bool UseExpandable { get; set; }
+
         public ConfigureSummaryReportResultView()
         {
             InitializeComponent();
@@ -148,7 +151,7 @@ namespace ConfigureSummaryReport
         public bool Configure(Window owner, IList<DataSource> dataSources)
         {
             // Show the configuration dialog.
-            Config.ConfigureSummaryReportResultViewDialog dialog = new Config.ConfigureSummaryReportResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, Expressions, FieldNameAliasMap, NewFields, UseAliasName, AllSelected) { Owner = owner };
+            Config.ConfigureSummaryReportResultViewDialog dialog = new Config.ConfigureSummaryReportResultViewDialog(dataSources, Caption, DataSourceId, MapWidgetId, Expressions, FieldNameAliasMap, NewFields, UseAliasName, AllSelected, UseExpandable) { Owner = owner };
             if (dialog.ShowDialog() != true)
                 return false;
 
@@ -161,6 +164,7 @@ namespace ConfigureSummaryReport
             NewFields = dialog.NoteFields;
             UseAliasName = dialog.UseAliasNameSelected;
             AllSelected = dialog.AllSelected;
+            UseExpandable = dialog.fieldListControl.useExpandableList;
 
             mapWidget = dialog.mapWidget;
 
@@ -295,11 +299,13 @@ namespace ConfigureSummaryReport
                             f = item.Attributes[ds.ObjectIdFieldName].ToString(),
                             ZoomExtent = item.Geometry.ToJson(),
                             AdditionalFieldsAndValues = createNewFieldList(item),
-                            LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : ""
+                            LabelField = (item.Attributes[AdditionalFields.Keys.ToList()[0]] != null) ? item.Attributes[AdditionalFields.Keys.ToList()[0]].ToString() : "",
+                            isParentExpandable = UseExpandable
                         };
 
-                        if(ds.IsSelectable)
-                            newItem.isExpanded = isItemExpanded(newItem);
+                        if(UseExpandable)
+                            if(ds.IsSelectable)
+                                newItem.isExpanded = isItemExpanded(newItem);
 
                         items.Add(newItem);
                     }
@@ -531,4 +537,23 @@ namespace ConfigureSummaryReport
             return null;
         }
     }
+
+    public class QueueDisplayDataTemplateSelector : DataTemplateSelector
+    {
+        public override DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
+        {
+            SiteDetails siteItem = item as SiteDetails;
+            var element = container as FrameworkElement;
+            if (siteItem != null)
+            {
+                if(siteItem.isParentExpandable)
+                    return element.FindResource("ExpanderTemplate") as DataTemplate;
+                else
+                    return element.FindResource("ExpanderTemplate2") as DataTemplate;
+            }
+            else
+                return element.FindResource("ExpanderTemplate") as DataTemplate;
+        }
+    }
+
 }

@@ -33,10 +33,11 @@ namespace ConfigureSummaryReport.Config
         public IDictionary<string, string> AdditionalFieldNames { get; private set; }
         public bool AllSelected { get; private set; }
         public bool UseAliasNameSelected { get; private set; }
+        public bool UseExpandable { get; private set; }
 
         #region Dialog
 
-        public ConfigureSummaryReportResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, ObservableCollection<Model.Expression> Expressions, ObservableCollection<StringItems2> SelectFieldList, ObservableCollection<NewField> noteFields, bool useAliasName, bool allSelected)
+        public ConfigureSummaryReportResultViewDialog(IList<DataSource> dataSources, string initialCaption, string initialDataSourceId, string mapWidgetId, ObservableCollection<Model.Expression> Expressions, ObservableCollection<StringItems2> SelectFieldList, ObservableCollection<NewField> noteFields, bool useAliasName, bool allSelected, bool useExpandable)
         {
             InitializeComponent();
 
@@ -58,7 +59,7 @@ namespace ConfigureSummaryReport.Config
 
             //these will rehydrate state of the UI
             InitializeExpressions(Expressions);
-            InitializeFieldList(SelectFieldList, useAliasName, allSelected);
+            InitializeFieldList(SelectFieldList, useAliasName, allSelected, useExpandable);
             InitializeNoteFields(noteFields);
 
             // When re-configuring, initialize the widget config dialog from the existing settings.
@@ -178,10 +179,11 @@ namespace ConfigureSummaryReport.Config
             noteFieldControl.InitializeNoteFields(noteFields);
         }
 
-        private void InitializeFieldList(ObservableCollection<StringItems2> SelectFieldList, bool useAliasNameValue, bool selectAll)
+        private void InitializeFieldList(ObservableCollection<StringItems2> SelectFieldList, bool useAliasNameValue, bool selectAll, bool useExpandable)
         {
             AllSelected = selectAll;
             UseAliasNameSelected = useAliasNameValue;
+            UseExpandable = useExpandable;
 
             FieldNameAliasMap = SelectFieldList;
             if (FieldNameAliasMap != null)
@@ -190,6 +192,7 @@ namespace ConfigureSummaryReport.Config
                 fieldListControl.FieldNameAliasMap = FieldNameAliasMap;
                 fieldListControl.chkBoxSelectAll.IsChecked = AllSelected;
                 fieldListControl.chkBoxUseAliasName.IsChecked = UseAliasNameSelected;
+                fieldListControl.chkBoxUseExpandableList.IsChecked = UseExpandable;
             }
         }
 

@@ -25,6 +25,7 @@ namespace ConfigureSummaryReport.Controls
     {
         ObservableCollection<StringItems2> _FieldNameAliasMap;
         bool bypassCheck = false;
+        public bool useExpandableList = true;
 
         public FieldListControl()
         {
@@ -156,6 +157,11 @@ namespace ConfigureSummaryReport.Controls
                     chkBoxSelectAll.IsChecked = true;
                 }
             }
+        }
+
+        private void chkBoxUseExpandableList_Click(object sender, RoutedEventArgs e)
+        {
+            useExpandableList = ((CheckBox)sender).IsChecked.Value;
         }
     }
 }

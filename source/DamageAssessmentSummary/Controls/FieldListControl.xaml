@@ -51,7 +51,12 @@
                               Click="chkBoxSelectAllAliasNames_Click"
                               IsChecked="True"
                               Margin="10,10,10,10"/>
-                </StackPanel>
+                        <CheckBox x:Name="chkBoxUseExpandableList" 
+                              Content="Display Expandable List" 
+                              Click="chkBoxUseExpandableList_Click"
+                              IsChecked="True"
+                              Margin="10,10,10,10"/>
+                    </StackPanel>
                 <controls:DraggableListView x:Name="chkBoxListView" 
                                             SelectionMode="Single" 
                                             ItemContainerStyle="{StaticResource ItemContStyle}"
