@@ -55,6 +55,8 @@
                               Content="Display Expandable List" 
                               Click="chkBoxUseExpandableList_Click"
                               IsChecked="True"
+                                  IsEnabled="False"
+                                  Visibility="Hidden"
                               Margin="10,10,10,10"/>
                     </StackPanel>
                 <controls:DraggableListView x:Name="chkBoxListView" 
