@@ -8,7 +8,7 @@
              xmlns:local="clr-namespace:ConfigureSummaryReport">
     <UserControl.Resources>
         <local:QueueDisplayDataTemplateSelector x:Key="QueueDisplayDataTemplateSelector"/>
-        
+
         <DataTemplate x:Key="AdditionalFieldsDataTemplate">
             <!--TEST-->
             <!--<Grid>
@@ -38,7 +38,7 @@
                          Foreground="{DynamicResource ThemedForegroundBrush}" 
                          FontSize="{DynamicResource ThemedTextSize}" />
             </Grid>-->
-            
+
             <!--ORG-->
             <!--<Grid>
                 <Grid.ColumnDefinitions>
@@ -61,7 +61,7 @@
                          Foreground="{DynamicResource ThemedForegroundBrush}" 
                          FontSize="{DynamicResource ThemedTextSize}" />
             </Grid>-->
-            
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -70,7 +70,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
+
                 <TextBlock Text="{Binding Path=key}" 
                            Grid.Row="0"
                            Grid.Column="0"
@@ -91,8 +91,8 @@
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="ExpanderTemplate">
-            <Expander ScrollViewer.CanContentScroll="True" 
-                      ScrollViewer.VerticalScrollBarVisibility="Visible" 
+            <Expander ScrollViewer.CanContentScroll="False" 
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled" 
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       Background="{DynamicResource ThemedBackgroundBrush}" 
                       Foreground="{DynamicResource ThemedForegroundBrush}" 
@@ -109,8 +109,7 @@
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="300">
-                            <ItemsControl x:Name="lvAdditionalFields" 
+                        <ItemsControl x:Name="lvAdditionalFields" 
                                   ItemsSource="{Binding Path=AdditionalFieldsAndValues}" 
                                   ItemTemplate="{StaticResource AdditionalFieldsDataTemplate}"      
                                   Grid.Row="0"
@@ -118,9 +117,8 @@
                                   Foreground="{DynamicResource ThemedForegroundBrush}" 
                                   FontSize="{DynamicResource ThemedTextSize}">
                         </ItemsControl>
-                        </ScrollViewer>
                         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
-                        <Button x:Name="ZoomToFeature" 
+                            <Button x:Name="ZoomToFeature" 
                                 Content="Zoom To Feature" 
                                 Width="100" 
                                 Grid.Row="1"
@@ -146,18 +144,14 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxHeight="300" Background="{DynamicResource ThemedBackgroundBrush}" 
-                      Foreground="{DynamicResource ThemedForegroundBrush}" 
-                      FontSize="{DynamicResource ThemedTextSize}">
-                    <ItemsControl x:Name="lvAdditionalFields" 
+                <ItemsControl x:Name="lvAdditionalFields" 
                                   ItemsSource="{Binding Path=AdditionalFieldsAndValues}" 
                                   ItemTemplate="{StaticResource AdditionalFieldsDataTemplate}"      
                                   Grid.Row="0"
                                   Background="{DynamicResource ThemedBackgroundBrush}" 
                                   Foreground="{DynamicResource ThemedForegroundBrush}" 
                                   FontSize="{DynamicResource ThemedTextSize}">
-                    </ItemsControl>
-                </ScrollViewer>
+                </ItemsControl>
                 <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
                     <Button x:Name="ZoomToFeature" 
                                 Content="Zoom To Feature" 
@@ -182,7 +176,7 @@
     <Grid Margin="2,2,2,2">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0"  
@@ -198,7 +192,7 @@
                 FontSize="{DynamicResource ThemedTextSize}" >
             </ListView>-->
             <ListView Name="lvSiteDetails" 
-                ScrollViewer.CanContentScroll="True"  
+                ScrollViewer.CanContentScroll="False"  
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ItemTemplateSelector="{StaticResource QueueDisplayDataTemplateSelector}"
                 ItemContainerStyle="{StaticResource ThemedSeparatorLineNoSelectionNoHoverListBoxItemStyle}"
