@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ConfigureSummaryReport.Model
+namespace DamageAssessmentSummary.Model
 {
     [DataContract]
     public class Expression : INotifyPropertyChanged

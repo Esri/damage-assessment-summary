@@ -1,4 +1,4 @@
-﻿using ConfigureSummaryReport.Config;
+﻿using DamageAssessmentSummary.Config;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,9 +9,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using ConfigureSummaryReport.Model;
+using DamageAssessmentSummary.Model;
 
-namespace ConfigureSummaryReport.Controls
+namespace DamageAssessmentSummary.Controls
 {
     /// <summary>
     /// enables serveral additional features for a standard TextBox

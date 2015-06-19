@@ -14,10 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ConfigureSummaryReport.Model;
-//using ConfigureSummaryReport.Config;
+using DamageAssessmentSummary.Model;
+//using DamageAssessmentSummary.Config;
 
-namespace ConfigureSummaryReport.Controls
+namespace DamageAssessmentSummary.Controls
 {
     /// <summary>
     /// Interaction logic for FilterControl.xaml

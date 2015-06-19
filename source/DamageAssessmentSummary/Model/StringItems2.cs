@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using ConfigureSummaryReport.Model;
+using DamageAssessmentSummary.Model;
 
-namespace ConfigureSummaryReport.Model
+namespace DamageAssessmentSummary.Model
 {
     [DataContract]
     public class StringItems2 : INotifyPropertyChanged

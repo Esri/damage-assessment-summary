@@ -14,9 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ConfigureSummaryReport.Model;
+using DamageAssessmentSummary.Model;
 
-namespace ConfigureSummaryReport.Controls
+namespace DamageAssessmentSummary.Controls
 {
     /// <summary>
     /// Interaction logic for FieldListControl.xaml

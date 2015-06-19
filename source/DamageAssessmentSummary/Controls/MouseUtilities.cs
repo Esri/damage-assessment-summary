@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 
-namespace ConfigureSummaryReport.Controls
+namespace DamageAssessmentSummary.Controls
 {
 	/// <summary>
 	/// Provides access to the mouse location by calling unmanaged code.
