@@ -14,6 +14,7 @@ using ConfigureSummaryReport.Model;
 
 namespace ConfigureSummaryReport.Controls
 {
+    //class is based on example from: http://www.codeproject.com/Articles/17266/Drag-and-Drop-Items-in-a-WPF-ListView
     public class DraggableListView : ListView
     {
         Point ptMouseDown;
