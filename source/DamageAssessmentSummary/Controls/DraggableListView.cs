@@ -1,3 +1,4 @@
+// Copyright (C) Josh Smith - January 2007
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
