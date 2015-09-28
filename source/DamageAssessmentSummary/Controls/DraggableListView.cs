@@ -1,5 +1,4 @@
-// Copyright (C) Josh Smith - January 2007
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,7 +13,9 @@ using ConfigureSummaryReport.Model;
 
 namespace ConfigureSummaryReport.Controls
 {
-    //class is based on example from: http://www.codeproject.com/Articles/17266/Drag-and-Drop-Items-in-a-WPF-ListView
+    //this class is based on a class written by Josh Smith - January 2007
+    //example from: http://www.codeproject.com/Articles/17266/Drag-and-Drop-Items-in-a-WPF-ListView
+    //I Removed DragAdorner and moved away from the DragDropManager approach the sample used and implemented ListView directly
     public class DraggableListView : ListView
     {
         Point ptMouseDown;
@@ -407,7 +408,10 @@ namespace ConfigureSummaryReport.Controls
         }
 
     }
-    
+
+
+    //this class is based on a class written by Josh Smith - January 2007
+    //example from: http://www.codeproject.com/Articles/17266/Drag-and-Drop-Items-in-a-WPF-ListView
     /// <summary>
     /// Event arguments used to handle ProcessDrop event.
     /// </summary>
@@ -468,7 +472,8 @@ namespace ConfigureSummaryReport.Controls
         }
     }
 
-    /// <summary>
+    //this class is based on a class written by Josh Smith - January 2007
+    //example from: http://www.codeproject.com/Articles/17266/Drag-and-Drop-Items-in-a-WPF-ListView
     /// Exposes attached properties to allow triggers to modify the appearance of ListViewItems
     /// in a ListView during a drag-drop operation.
     /// </summary>
