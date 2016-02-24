@@ -1,0 +1,16 @@
+{
+  "type": "Widget",
+  "title": "Damage Assessment Summary Widget",
+  "description": "DamageAssessmentSummary",
+  "thumbnailPath": "DamageAssessmentSummary.png",
+  "useDataFromView": true,
+  "runtime": {
+    "path": "DamageAssessmentSummary.html"
+  },
+  "configuration": {
+    "path": "damageAssessmentSummaryConfig.html",
+    "requireDataSource": true
+  },
+  "credits": "Esri"
+}
+
