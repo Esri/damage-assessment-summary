@@ -42,7 +42,7 @@ define([
     // provide icon for row header to show open/close and highlight on hover
     // handle user entered values into the txt boxes or change them to labels
     // handle the issue that causes the row to collapse when you zoom or pan to a feature...also check this in the native app side
-    // figure out how to get the style details for when the user changes themes
+    // figure out how to get the style details for when the user changes themes...can't...Jay C logged a bug
 
     hostReady: function () {
       // Create the store we will use to display the features in the grid
@@ -54,18 +54,27 @@ define([
       var dataSourceConfig = this.getDataSourceConfig(dataSourceProxy);
 
       this.getMapWidgetProxies().then(lang.hitch(this, function (results) {
-        this._initQuery(dataSourceConfig.selectedFieldsNames, dataSourceProxy.objectIdFieldName);
+        this._initQuery(dataSourceConfig, dataSourceProxy);
         this._createList(dataSourceConfig, dataSourceProxy, results[0]);
       }));
     },
 
-    _initQuery: function (configDetails, oidName) {
+    _initQuery: function (dataSourceConfig, dataSourceProxy) {
+      var configDetails = dataSourceConfig.selectedFieldsNames;
+      var oidName = dataSourceProxy.objectIdFieldName;
+      var displayAlias = dataSourceConfig.displayAlias;
+      console.log(displayAlias);
+
+      //stores actual field name
       this.fieldsToQuery = [];
+      //lookup object {fieldName: displayName}
+      this.configFields = {};
       var idx = 0;
       for (var i = 0; i < configDetails.length; i++) {
         var f = configDetails[i];
         if (f.checked) {
           this.fieldsToQuery.splice(idx, 0, f.name);
+          this.configFields[f.name] = displayAlias ? f.displayName : f.name;
           idx += 1;
         }
       }
@@ -74,8 +83,10 @@ define([
         idx += 1;
       }
 
-      if (this.fieldsToQuery.indexOf(oidName) === -1)
+      if (this.fieldsToQuery.indexOf(oidName) === -1) {
         this.fieldsToQuery.splice(idx, 0, oidName);
+        //this.configFields[oidName] = oidName;
+      }
 
       this.query = new Query();
       this.query.outFields = this.fieldsToQuery;
@@ -89,6 +100,7 @@ define([
         dataProxy: dataSourceProxy,
         store: this.store,
         fields: this.fieldsToQuery,
+        configFields: this.configFields,
         cleanEmptyObservers: false,
         selectionMode: this.isNative ? "extended" : "toggle",
         renderRow: function (feature) {
@@ -127,38 +139,24 @@ define([
           var idx = 0;
           for (var i = 0; i < this.fields.length; i++) {
             var fieldName = this.fields[i];
-            domConstruct.create('label', {
-              className: "fieldItemLabel",
-              innerHTML: fieldName + ":"
-            }, contentDiv);
-            domConstruct.create('input', {
-              className: "fieldItemValue",
-              value: feature.attributes[fieldName]
-            }, contentDiv);
+            //do this so we can have the OID in the query to support selection
+            // but avoid drawing in the widget
+            if (typeof (this.configFields[fieldName]) !== 'undefined') {
+              domConstruct.create('label', {
+                className: "fieldItemLabel",
+                innerHTML: this.configFields[fieldName] + ":"
+              }, contentDiv);
+              domConstruct.create('input', {
+                className: "fieldItemValue",
+                value: feature.attributes[fieldName]
+              }, contentDiv);
 
-            if (idx === 0) {
-              titleDiv.innerHTML = feature.attributes[fieldName];
-              idx += 1;
+              if (idx === 0) {
+                titleDiv.innerHTML = feature.attributes[fieldName];
+                idx += 1;
+              }
             }
           }
-          //for (var fieldName in feature.attributes) {
-          //  //verify that the field is in the list
-          //  if (this.fields.indexOf(fieldName) > -1) {
-          //    domConstruct.create('label', {
-          //      className: "fieldItemLabel",
-          //      innerHTML: fieldName + ":"
-          //    }, contentDiv);
-          //    domConstruct.create('input', {
-          //      className: "fieldItemValue",
-          //      value: feature.attributes[fieldName]
-          //    }, contentDiv);
-
-          //    if (idx === 0) {
-          //      titleDiv.innerHTML = feature.attributes[fieldName];
-          //      idx += 1;
-          //    }
-          //  }
-          //}
 
           var alignContainer = domConstruct.create('div', {
             className: "fieldItemLabel"
@@ -243,6 +241,7 @@ define([
           // build the header
           if (!hasColumnNames) {
             for (attribute in attributes) {
+              //TODO need to filter out the OID field
               csvData += (csvData.length === 0 ? "" : ",") + '"' + attribute + '"';
             }
             csvData += "\r\n";

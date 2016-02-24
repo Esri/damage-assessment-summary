@@ -35,39 +35,82 @@ define([
 
     postCreate: function () {
       this.inherited(arguments);
-
-      //this.multiSelectDiv.set("labelAttr", "alias");
-      //this.multiSelectDiv.set("multiple", true);
+      console.log("PC");
     },
 
     dataSourceSelectionChanged: function (dataSource, dataSourceConfig) {
       this.dataSourceConfig = dataSourceConfig;
 
-      //var alphaNumericFields = [];
-      //dataSource.fields.forEach(function (field) {
-      //  switch (field.type) {
-      //    case "esriFieldTypeString":
-      //    case "esriFieldTypeSmallInteger":
-      //    case "esriFieldTypeInteger":
-      //    case "esriFieldTypeSingle":
-      //    case "esriFieldTypeDouble":
-      //      alphaNumericFields.push(field);
-      //      return;
-      //  }
-      //});
+      //TODO need to understand when and what all happens to the config when a datasource changes
+      // also need to understand when it's ok to check the config values
+      this._createTableOptions(dataSourceConfig.displayAll, dataSourceConfig.displayAlias);
+      this.dataSourceConfig.selectedFieldsNames = this._createSimpleTable(dataSource);
+      this._initTextBoxes(this.configListDiv.childNodes[0].rows, this.dataSourceConfig.displayAlias); 
+    },
 
-      //var alphaNumericFieldsStore = new Memory({
-      //  idProperty: "name",
-      //  data: alphaNumericFields
-      //});
+    _createTableOptions: function (displayAll, displayAlias) {
 
-      //this._createList(alphaNumericFieldsStore);
-      this.dataSourceConfig.selectedFieldsNames = this._createSimpleTable(dataSource)
-      //this.multiSelectDiv.set("store", alphaNumericFieldsStore);
+      console.log("Display All: " + displayAll);
+      console.log("Display Alias: " + displayAlias);
 
-      // Set previous fields saved in config
-      //if (Array.isArray(dataSourceConfig.selectedFieldsNames))
-      //  this.multiSelectDiv.set("value", dataSourceConfig.selectedFieldsNames);
+      var dAll = typeof (displayAll) !== 'undefined' ? displayAll : false;
+      this.dataSourceConfig.displayAll = dAll;
+      console.log("Display All: " + dAll);
+
+      var dAlias = typeof (displayAlias) !== 'undefined' ? displayAlias : true;
+      this.dataSourceConfig.displayAlias = dAlias;
+      console.log("Display Alias: " + dAlias);
+
+      //Display All Option
+      domConstruct.create('input', {
+        type: "checkbox",
+        id: "displayAll",
+        checked: dAll,
+        className: "optionsCheckbox",
+        onclick: lang.hitch(this, function (v) {
+          this.dataSourceConfig.displayAll = v.target.checked;
+          var rows = this.configListDiv.childNodes[0].rows;
+          for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var cbCell = row.cells[0];
+            cbCell.childNodes[0].click();
+          }
+          this.readyToPersistConfig(true);
+        })
+      }, this.configListDivOptions);
+
+      domConstruct.create('label', {
+        innerHTML: "Display All Fields",
+        className: "optionsLabel",
+        "for": "displayAll"
+      }, this.configListDivOptions);
+
+      //Display Field Alias Option
+      domConstruct.create('input', {
+        type: "checkbox",
+        id: "displayAlias",
+        checked: dAlias,
+        className: "optionsCheckbox",
+        onclick: lang.hitch(this, function (v) {
+          this.dataSourceConfig.displayAlias = v.target.checked;
+          var rows = this.configListDiv.childNodes[0].rows;
+          this._initTextBoxes(rows, v.target.checked);
+          this.readyToPersistConfig(true);
+        })
+      }, this.configListDivOptions);
+
+      domConstruct.create('label', {
+        innerHTML: "Display Field Alias",
+        className: "optionsLabel",
+        "for": "displayAll"
+      }, this.configListDivOptions);
+    },
+
+    _initTextBoxes: function (rows, v) {
+      for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        row.cells[1].childNodes[0].disabled = !v;
+      }
     },
 
     _createSimpleTable: function (dataSource) {
@@ -76,6 +119,7 @@ define([
       }, this.configListDiv);
 
       var idx = 0;
+      var row;
       //var header = table.createTHead();
       //var row = header.insertRow(idx);
 
@@ -85,42 +129,37 @@ define([
 
       //I Guess I will load from the config if it's defiend
       //and remove from this copy if it's found...so I know what ones are left
-      console.log("S");
+
+      console.log("starting field work..................");
       var dsFields = lang.clone(dataSource.fields);
       console.log(dsFields);
-      console.log(dsFields.length);
       fieldLoop:
         for (var k in dsFields) {
           var f = dsFields[k];
-          console.log(f);
-
           if (f.type !== "esriFieldTypeString" &&
               f.type !== "esriFieldTypeSmallInteger" &&
               f.type !== "esriFieldTypeInteger" &&
               f.type !== "esriFieldTypeSingle" &&
               f.type !== "esriFieldTypeDouble") {
             dsFields.splice(i, 1);
+            console.log("Removing field: " + f.name + " " + f.type);
           }
         }
-
+      console.log(dsFields);
       var currentItems = [];
-      console.log("DS");
-      console.log(this.dataSourceConfig.selectedFieldsNames);
       if (this.dataSourceConfig.selectedFieldsNames) {
         for (var key in this.dataSourceConfig.selectedFieldsNames) {
           var persistField = this.dataSourceConfig.selectedFieldsNames[key];
-          console.log("persistField");
+          console.log(persistField);
           row = table.insertRow(idx);
-          console.log("row");
           row.myIndex = idx;
+          console.log("Setting persisted index: " + idx);
+          console.log(row);
 
           var checked = persistField.checked;
-          console.log("checked");
           var displayName = persistField.displayName;
-          console.log("displayName");
           var name = persistField.name;
-          console.log("name");
-
+          console.log("Inserting persisted index: " + idx);
           currentItems.splice(idx, 0, {
             checked: checked,
             displayName: displayName,
@@ -136,86 +175,68 @@ define([
                 break configFieldLoop;
               }
             }
-
+          console.log("inserting row: " + row);
           this._insertCell(row, checked, 0);
           this._insertCell(row, displayName, 1);
           this._insertCell(row, name, 2);
+          console.log("inserted row: " + row);
           idx += 1;
         }
       } else {
         dataSource.fields.forEach(lang.hitch(this, function (field) {
-          row = table.insertRow(idx);
-          row.myIndex = idx;
+          console.log("Setting myIndex: " + idx);
           switch (field.type) {
             case "esriFieldTypeString":
             case "esriFieldTypeSmallInteger":
             case "esriFieldTypeInteger":
             case "esriFieldTypeSingle":
             case "esriFieldTypeDouble":
-              //these will be set differently if they are currently in the config
+              row = table.insertRow(idx);
+              row.myIndex = idx;
               var checked = false;
               var displayName = field.alias;
-
-              var c = this.dataSourceConfig.selectedFieldsNames;
-
+              console.log("Inserting index: " + idx);
               currentItems.splice(idx, 0, {
                 checked: checked,
                 displayName: displayName,
                 name: field.name,
                 indexInTable: idx
               });
-
+              console.log("inserting row: " + row);
               this._insertCell(row, checked, 0);
               this._insertCell(row, displayName, 1);
               this._insertCell(row, field.name, 2);
+              console.log("inserted row: " + row);
+              idx += 1;
+              console.log("Incrementing index: " + idx);
               return;
           }
-          idx += 1;
         }));
       }
 
       return currentItems;
     },
 
-    _insertCell: function(row, v, idx){
+    _insertCell: function (row, v, idx) {
       var cell = row.insertCell(idx);
       if (idx === 0) {
         domConstruct.create('input', {
           type: "checkbox",
           checked: v,
           onclick: lang.hitch(this, function (b) {
-            if (!this.dataSourceConfig)
-              return;
-
-            var persistedNames = this.dataSourceConfig.selectedFieldsNames;
-
             var row = b.target.parentElement.parentElement;
-
-            //build the object we will store here
             var fieldName = row.cells[2].childNodes[0].textContent;
-
-            for (var i = 0; i < persistedNames.length; i++) {
-              if (persistedNames[i].name === fieldName) {
-                persistedNames.splice(i, 1);
-                break;
-              }
-            }
-
-            //TODO make sure the row index starts at 1 rather than 0 like the array...otherwise
-            // remove the -1 for  the index
-            persistedNames.splice(row.myIndex -1, 0, {
-              checked: row.cells[0].childNodes[0].checked,
-              displayName: row.cells[1].childNodes[0].value,
-              name: fieldName,
-              indexInTable: row.myIndex
-            });
-
-            this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0);
+            this._updateList(row, fieldName, row.myIndex);
           })
         }, cell);
       } else if (idx === 1) {
         domConstruct.create('input', {
-          value: v
+          value: v,
+          oninput: lang.hitch(this, function (e) {
+            var row = e.srcElement.parentElement.parentElement;
+            var fieldName = row.cells[2].childNodes[0].textContent;
+            this._updateList(row, fieldName, row.myIndex)
+          })
         }, cell);
       } else if (idx === 2) {
         var l = domConstruct.create('label', {
@@ -224,31 +245,28 @@ define([
       }
     },
 
-    _updateList: function(row){
-
-    },
-
-    _createList: function (alphaNumericFieldsStore) {
-      //Thought about setting up the field name list like this but not sure how to move rows up and down...
-      // I guess you would alter the order in the store and then update the list??
-
-      this.list = new (declare([List, Selection]))({
-        store: alphaNumericFieldsStore,
-        cleanEmptyObservers: false,
-        selectionMode: this.isNative ? "extended" : "toggle",
-        renderRow: function (attributes) {
-          var divNode = domConstruct.create('div', {
-            className: "test"
-          });
-
-          return divNode;
+    _updateList: function (row, fieldName, index) {
+      //update the persisted values for the config
+      var persistedNames = this.dataSourceConfig.selectedFieldsNames;
+      for (var i = 0; i < persistedNames.length; i++) {
+        if (persistedNames[i].name === fieldName) {
+          persistedNames.splice(i, 1);
+          break;
         }
-      }, this.configListDiv);
+      }
 
-      this.list.startup();
+      persistedNames.splice(index, 0, {
+        checked: row.cells[0].childNodes[0].checked,
+        displayName: row.cells[1].childNodes[0].value,
+        name: fieldName,
+        indexInTable: index
+      });
+
+      this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0);
     },
 
     onSelectionChanged: function (value) {
+      //TODO this is out of sync and needs to be updated
       if (!this.dataSourceConfig)
         return;
 

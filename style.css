@@ -155,9 +155,17 @@ label {
 }
 
 .configRowElementContainer{
-  height: 300px; 
+  height: 340px; 
   margin-left: 20px;
+  margin-top: 10px;
   overflow: hidden;
+}
+
+.borderContainer{
+  border: 1px solid #dcdcdc;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .test{
@@ -183,5 +191,20 @@ label {
 
 .list{
   overflow: auto;
-  height: inherit;
+  height: 290px;
+}
+
+.optionsCheckbox{
+  float: left;
+}
+
+.optionsLabel{
+  float: left;
+  margin-right: 20px;
+}
+
+.optionsContainer{
+  height: 20px; 
+  width: 100%; 
+  margin-bottom: 20px;
 }
