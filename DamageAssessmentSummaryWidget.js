@@ -64,7 +64,7 @@ define([
       var configDetails = dataSourceConfig.selectedFieldsNames;
       var oidName = dataSourceProxy.objectIdFieldName;
       var displayAlias = dataSourceConfig.displayAlias;
-      console.log(displayAlias);
+      //console.log(displayAlias);
 
       //stores actual field name
       this.fieldsToQuery = [];
@@ -91,7 +91,7 @@ define([
 
       this.query = new Query();
       this.query.outFields = this.fieldsToQuery;
-      console.log(this.fieldsToQuery);
+      //console.log(this.fieldsToQuery);
       this.query.returnGeometry = true;
     },
 
@@ -113,12 +113,16 @@ define([
             className: "titleDiv",
             onclick: function (evt) {
               var parent = evt.target.parentNode;
-              if (parent.childNodes.length === 1) {
-                parent = parent.parentNode;
+              if (!domClass.contains(parent, "bottomBorder")) {
+                for (var i = 0; i < 2; i++) {
+                  parent = parent.parentNode;
+                  if (domClass.contains(parent, "bottomBorder")) {
+                    break;
+                  }
+                }
               }
               var img = parent.childNodes[0].childNodes[0];
               var row = parent.childNodes[1];
-              
               if (domClass.contains(row, "rowOff")) {
                 domClass.remove(row, "rowOff");
                 domClass.add(row, "rowOn");
@@ -139,6 +143,10 @@ define([
 
           domConstruct.create('div', {
             className: "baseImage downImage image-down-highlight"
+          }, titleDiv);
+
+          var title = domConstruct.create('div', {
+            className: "title"
           }, titleDiv);
 
           var contentDiv = domConstruct.create('div', {
@@ -162,7 +170,9 @@ define([
               }, contentDiv);
 
               if (idx === 0) {
-                titleDiv.innerHTML = feature.attributes[fieldName];
+                console.log(fieldName);
+                console.log(feature.attributes[fieldName]);
+                title.innerHTML = feature.attributes[fieldName];
                 idx += 1;
               }
             }
@@ -212,15 +222,11 @@ define([
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
-
       //TODO extend this like the list example to account for feature actions??
 
       // Execute the query. A request will be sent to the server to query for the features.
       // The results are in the featureSet
       dataSourceProxy.executeQuery(this.query).then(function (featureSet) {
-        //// Show the features in the table
-        //this.updateAttributeTable(featureSet, dataSourceProxy);
-
         if (this.store.data.length > 0) {
           this.store.query().forEach(function (item) {
             this.store.remove(item.id);

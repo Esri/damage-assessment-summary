@@ -17,15 +17,6 @@ label {
   display: block;
 }
 
-.dataSourceInfoLabel {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.configLabel {
-  margin-bottom: 10px;
-}
-
 .table {
   display: table;
   height: 100%;
@@ -135,6 +126,15 @@ label {
   height: 30px;
   width: 100%;
   line-height: 30px;
+  overflow: hidden;
+}
+
+.title {
+  height: 30px;
+  line-height: 30px;
+  overflow: hidden;
+  margin-left: 8px;
+  display: inline;
 }
 
 .titleDiv:hover .image-up-highlight{
@@ -176,6 +176,29 @@ label {
   overflow: hidden;
 }
 
+.configOrderContainer{
+  height: inherit;
+  text-align: center;
+}
+
+.configUpOrder{
+  cursor: pointer;
+  background-image: url(../DamageAssessmentSummary/images/up_disabled.png);
+}
+
+.configUpOrder:hover{
+  background-image: url(../DamageAssessmentSummary/images/up_hover.png);
+}
+
+.configDownOrder{
+  cursor: pointer;
+  background-image: url(../DamageAssessmentSummary/images/down_disabled.png);
+}
+
+.configDownOrder:hover{
+  background-image: url(../DamageAssessmentSummary/images/down_hover.png);
+}
+
 .borderContainer{
   border: 1px solid #dcdcdc;
   margin-left: 10px;
@@ -191,9 +214,18 @@ label {
 }
 
 .tableTest{
-  border: 1px solid double;
-  border-collapse: collapse;
+  border: 1px solid #dcdcdc;
+  /*border-collapse: collapse;*/
   height: inherit;
+  width: 90%;
+}
+
+.tableTest tr:hover {
+  background-color: #518DCA;
+}
+
+td {
+    border: 1px solid #dcdcdc;
 }
 
 .tableTest2{
@@ -207,6 +239,7 @@ label {
 .list{
   overflow: auto;
   height: 290px;
+  width: 100%;
 }
 
 .optionsCheckbox{

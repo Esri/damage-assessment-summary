@@ -18,6 +18,7 @@ define([
   'dojo/dom-construct',
   "dojo/store/Memory",
   'dojo/dom-class',
+  'dojo/_base/html',
   "dijit/form/CheckBox",
   "dgrid/OnDemandList",
   "dgrid/Selection",
@@ -28,7 +29,7 @@ define([
   "esri/opsdashboard/WidgetConfigurationProxy",
   "dojo/text!./DamageAssessmentSummaryWidgetConfigTemplate.html",
   "dojo/parser"
-], function (declare, lang, domConstruct, Memory, domClass, CheckBox, List, Selection, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, CheckedMultiSelect, WidgetConfigurationProxy, templateString) {
+], function (declare, lang, domConstruct, Memory, domClass, html, CheckBox, List, Selection, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, CheckedMultiSelect, WidgetConfigurationProxy, templateString) {
 
   return declare("DamageAssessmentSummaryWidgetConfig", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, WidgetConfigurationProxy], {
     templateString: templateString,
@@ -118,18 +119,23 @@ define([
     },
 
     _createSimpleTable: function (dataSource) {
-      var table = domConstruct.create('table', {
+      var table1 = domConstruct.create('table', {
         className: "tableTest"
       }, this.configListDiv);
 
+      var table = domConstruct.create('tbody', {
+        className: "tableTest"
+      }, table1);
+
       var idx = 0;
       var row;
-      //var header = table.createTHead();
-      //var row = header.insertRow(idx);
+      var header = table1.createTHead();
+      var row = header.insertRow(0);
 
-      //this._insertCell(row, "Display", 0);
-      //this._insertCell(row, "Field Alias", 1);
-      //this._insertCell(row, "Field Name", 2);
+      this._insertHeaderCell(row, "Display", 0);
+      this._insertHeaderCell(row, "Field Alias", 1);
+      this._insertHeaderCell(row, "Field Name", 2);
+      this._insertHeaderCell(row, "Order", 3);
 
       //I Guess I will load from the config if it's defiend
       //and remove from this copy if it's found...so I know what ones are left
@@ -183,6 +189,7 @@ define([
           this._insertCell(row, checked, 0);
           this._insertCell(row, displayName, 1);
           this._insertCell(row, name, 2);
+          this._insertCell(row, idx, 3);
           console.log("inserted row: " + row);
           idx += 1;
         }
@@ -210,6 +217,7 @@ define([
               this._insertCell(row, checked, 0);
               this._insertCell(row, displayName, 1);
               this._insertCell(row, field.name, 2);
+              this._insertCell(row, idx, 3);
               console.log("inserted row: " + row);
               idx += 1;
               console.log("Incrementing index: " + idx);
@@ -233,9 +241,11 @@ define([
             this._updateList(row, fieldName, row.myIndex);
           })
         }, cell);
+        html.setStyle(cell, 'text-align', 'center');
       } else if (idx === 1) {
         domConstruct.create('input', {
           value: v,
+          style: "width: 95%",
           oninput: lang.hitch(this, function (e) {
             var row = e.srcElement.parentElement.parentElement;
             var fieldName = row.cells[2].childNodes[0].textContent;
@@ -246,7 +256,66 @@ define([
         var l = domConstruct.create('label', {
           innerHTML: v
         }, cell);
+      } else if (idx === 3) {
+        //TODO need up image, down image, and up/down image
+        // set down only image for the first row and up only image for the last row and
+        // up/down for the rest
+        if (v === 0) {
+          //set down only image on hover
+        } 
+
+        var l = domConstruct.create('div', {
+          className: "configOrderContainer"
+        }, cell);
+
+        domConstruct.create('div', {
+          title: "Move Up",
+          className: "baseImage configUpOrder",
+          onclick: lang.hitch(this, function (b) {
+            var row = b.target.offsetParent.parentElement;
+            var table = row.parentNode;
+            var rows = table.rows;
+            var index = row.sectionRowIndex;
+            var newIndex = index - 1;
+            if (index > 0) {
+              var refRow = rows[newIndex];
+              table.insertBefore(row, refRow);
+              row.myIndex = newIndex;
+              refRow.myIndex = index;
+              this._updateList(row, row.cells[2].textContent, row.myIndex);
+              this._updateList(refRow, refRow.cells[2].textContent, refRow.myIndex);
+            }
+          })
+        }, l);
+
+        var l = domConstruct.create('div', {
+          title: "Move Down",
+          className: "baseImage configDownOrder",
+          onclick: lang.hitch(this, function (b) {
+            var row = b.target.offsetParent.parentElement;
+            var table = row.parentNode;
+            var rows = table.rows;
+            var index = row.sectionRowIndex;
+            var newIndex = index + 1;
+            if (index < rows.length) {
+              var refRow = rows[newIndex];
+              table.insertBefore(refRow, row);
+              row.myIndex = newIndex;
+              refRow.myIndex = index;
+              this._updateList(row, row.cells[2].textContent, row.myIndex);
+              this._updateList(refRow, refRow.cells[2].textContent, refRow.myIndex);
+            }
+          })
+        }, l);
       }
+    },
+
+    _insertHeaderCell: function (row, v, idx) {
+      var cell = row.insertCell(idx);
+      domConstruct.create('label', {
+        style: "font-weight: bold; background-color: #dcdcdc; text-align: center;",
+        innerHTML: v
+      }, cell);
     },
 
     _updateList: function (row, fieldName, index) {
