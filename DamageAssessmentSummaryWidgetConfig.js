@@ -73,7 +73,11 @@ define([
           for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             var cbCell = row.cells[0];
-            cbCell.childNodes[0].click();
+            if (v.target.checked && !cbCell.childNodes[0].checked) {
+              cbCell.childNodes[0].click();
+            } else if (!v.target.checked && cbCell.childNodes[0].checked) {
+              cbCell.childNodes[0].click();
+            }
           }
           this.readyToPersistConfig(true);
         })
@@ -275,13 +279,31 @@ define([
     },
 
     rowClicked: function (evt) {
-      var t = evt.target.nextElementSibling;
-      if (domClass.contains(t, "rowOff")) {
-        domClass.remove(t, "rowOff");
-        domClass.add(t, "rowOn");
+      var parent = evt.target.parentNode;
+      if (!domClass.contains(parent, "bottomBorder")) {
+        for (var i = 0; i < 2; i++) {
+          parent = parent.parentNode;
+          if (domClass.contains(parent, "bottomBorder")) {
+            break;
+          }
+        }
+      }
+      var row = parent.childNodes[3];
+      var img = parent.childNodes[1].childNodes[1];
+      if (domClass.contains(row, "rowOff")) {
+        domClass.remove(row, "rowOff");
+        domClass.add(row, "rowOn");
+        domClass.remove(img, "downImage");
+        domClass.add(img, "upImage");
+        domClass.remove(img, "image-down-highlight");
+        domClass.add(img, "image-up-highlight");
       } else {
-        domClass.remove(t, "rowOn");
-        domClass.add(t, "rowOff");
+        domClass.remove(row, "rowOn");
+        domClass.add(row, "rowOff");
+        domClass.remove(img, "upImage");
+        domClass.add(img, "downImage");
+        domClass.remove(img, "image-up-highlight");
+        domClass.add(img, "image-down-highlight");
       }
     }
   });

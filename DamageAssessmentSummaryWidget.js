@@ -26,11 +26,12 @@ define([
   "esri/opsdashboard/WidgetProxy",
   "esri/geometry/Extent",
   "dojo/store/Memory",
+  "dojo/query",
   "dojo/store/Observable",
   "esri/tasks/query",
   "dgrid/OnDemandGrid",
   "dojo/text!./DamageAssessmentSummaryWidgetTemplate.html"
-], function (declare, lang, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, Observable, Query, Grid, templateString) {
+], function (declare, lang, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, query, Observable, Query, Grid, templateString) {
 
   return declare("DamageAssessmentSummaryWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
     templateString: templateString,
@@ -109,26 +110,35 @@ define([
           });
 
           var titleDiv = domConstruct.create('div', {
-            style: "height: 30px; width: 100%;",
+            className: "titleDiv",
             onclick: function (evt) {
-              var t = evt.target.nextSibling;
-              var fc = t.firstChild;
-              if (domClass.contains(t, "rowOff")) {
-                domClass.remove(t, "rowOff");
-                domClass.add(t, "rowOn");
-                //domClass.remove(fc, "downImage");
-                //domClass.add(fc, "upImage");
+              var parent = evt.target.parentNode;
+              if (parent.childNodes.length === 1) {
+                parent = parent.parentNode;
+              }
+              var img = parent.childNodes[0].childNodes[0];
+              var row = parent.childNodes[1];
+              
+              if (domClass.contains(row, "rowOff")) {
+                domClass.remove(row, "rowOff");
+                domClass.add(row, "rowOn");
+                domClass.remove(img, "downImage");
+                domClass.add(img, "upImage");
+                domClass.remove(img, "image-down-highlight");
+                domClass.add(img, "image-up-highlight");
               } else {
-                domClass.remove(t, "rowOn");
-                domClass.add(t, "rowOff");
-                //domClass.remove(fc, "upImage");
-                //domClass.add(fc, "downImage");
+                domClass.remove(row, "rowOn");
+                domClass.add(row, "rowOff");
+                domClass.remove(img, "upImage");
+                domClass.add(img, "downImage");
+                domClass.remove(img, "image-up-highlight");
+                domClass.add(img, "image-down-highlight");
               }
             }
           }, divNode);
 
           domConstruct.create('div', {
-            className: "downImage"
+            className: "baseImage downImage image-down-highlight"
           }, titleDiv);
 
           var contentDiv = domConstruct.create('div', {
@@ -298,28 +308,5 @@ define([
       }
       return;
     }
-
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
