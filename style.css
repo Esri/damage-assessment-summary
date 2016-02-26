@@ -108,17 +108,32 @@ label {
   height: 15px;
   background-repeat: no-repeat;
   background-position: 50% 50%;
-  /*background-size: cover;*/
+  background-size: contain;
+  display: inline-block;
+  margin-left: 5px;
+  background-size: 11px 7px;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #083F77;
+}
+
+.configBaseOrderImage{
+  vertical-align:middle;
+  width: 15px;
+  height: 15px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
   display: inline-block;
   margin-left: 5px;
 }
 
 .upImage{
-  background-image: url(../DamageAssessmentSummary/images/up_default.png);
+  background-image: url(../SummaryReport/images/default_nav_up.png);
 }
 
 .downImage{
-  background-image: url(../DamageAssessmentSummary/images/down_default.png);
+  background-image: url(../SummaryReport/images/default_nav_down.png);
 }
 
 .titleDiv {
@@ -138,11 +153,13 @@ label {
 }
 
 .titleDiv:hover .image-up-highlight{
-  background-image: url(../DamageAssessmentSummary/images/up_hover.png);
+  background-image: url(../SummaryReport/images/nav_up.png);
+  background-color: #083F77;
 }
 
 .titleDiv:hover .image-down-highlight{
-  background-image: url(../DamageAssessmentSummary/images/down_hover.png);
+  background-image: url(../SummaryReport/images/nav_down.png);
+  background-color: #083F77;
 }
 
 .bottomBorder {
@@ -157,11 +174,13 @@ label {
 }
 
 .configRowHeader:hover .image-up-highlight{
-  background-image: url(../DamageAssessmentSummary/images/up_hover.png);
+  background-image: url(../SummaryReport/images/nav_up.png);
+  background-color: #083F77;
 }
 
 .configRowHeader:hover .image-down-highlight{
-  background-image: url(../DamageAssessmentSummary/images/down_hover.png);
+  background-image: url(../SummaryReport/images/nav_down.png);
+  background-color: #083F77;
 }
 
 .configText{
@@ -183,20 +202,30 @@ label {
 
 .configUpOrder{
   cursor: pointer;
-  background-image: url(../DamageAssessmentSummary/images/up_disabled.png);
+  background-image: url(../SummaryReport/images/up_disabled.png);
 }
 
 .configUpOrder:hover{
-  background-image: url(../DamageAssessmentSummary/images/up_hover.png);
+  background-image: url(../SummaryReport/images/up_hover.png);
 }
 
 .configDownOrder{
   cursor: pointer;
-  background-image: url(../DamageAssessmentSummary/images/down_disabled.png);
+  background-image: url(../SummaryReport/images/down_disabled.png);
 }
 
 .configDownOrder:hover{
-  background-image: url(../DamageAssessmentSummary/images/down_hover.png);
+  background-image: url(../SummaryReport/images/down_hover.png);
+}
+
+.configHeader{
+  font-weight: bold; 
+  background-color: #dcdcdc; 
+  text-align: center;
+}
+
+.configTextBox{
+  width: 95%;
 }
 
 .borderContainer{
@@ -221,7 +250,8 @@ label {
 }
 
 .tableTest tr:hover {
-  background-color: #518DCA;
+  background-color: #C5DDF7;
+    /*#518DCA*/
 }
 
 td {

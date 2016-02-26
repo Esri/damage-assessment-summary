@@ -27,16 +27,15 @@ define([
   "dijit/_WidgetsInTemplateMixin",
   "dojox/form/CheckedMultiSelect",
   "esri/opsdashboard/WidgetConfigurationProxy",
-  "dojo/text!./DamageAssessmentSummaryWidgetConfigTemplate.html",
+  "dojo/text!./SummaryReportWidgetConfigTemplate.html",
   "dojo/parser"
 ], function (declare, lang, domConstruct, Memory, domClass, html, CheckBox, List, Selection, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, CheckedMultiSelect, WidgetConfigurationProxy, templateString) {
 
-  return declare("DamageAssessmentSummaryWidgetConfig", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, WidgetConfigurationProxy], {
+  return declare("SummaryReportWidgetConfig", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, WidgetConfigurationProxy], {
     templateString: templateString,
 
     postCreate: function () {
       this.inherited(arguments);
-      console.log("PC");
     },
 
     dataSourceSelectionChanged: function (dataSource, dataSourceConfig) {
@@ -46,21 +45,18 @@ define([
       // also need to understand when it's ok to check the config values
       this._createTableOptions(dataSourceConfig.displayAll, dataSourceConfig.displayAlias);
       this.dataSourceConfig.selectedFieldsNames = this._createSimpleTable(dataSource);
+
+      console.log("Selected Names: ");
+      console.log(this.dataSourceConfig.selectedFieldsNames);
       this._initTextBoxes(this.configListDiv.childNodes[0].rows, this.dataSourceConfig.displayAlias); 
     },
 
     _createTableOptions: function (displayAll, displayAlias) {
-
-      console.log("Display All: " + displayAll);
-      console.log("Display Alias: " + displayAlias);
-
       var dAll = typeof (displayAll) !== 'undefined' ? displayAll : false;
       this.dataSourceConfig.displayAll = dAll;
-      console.log("Display All: " + dAll);
 
       var dAlias = typeof (displayAlias) !== 'undefined' ? displayAlias : true;
       this.dataSourceConfig.displayAlias = dAlias;
-      console.log("Display Alias: " + dAlias);
 
       //Display All Option
       domConstruct.create('input', {
@@ -140,9 +136,9 @@ define([
       //I Guess I will load from the config if it's defiend
       //and remove from this copy if it's found...so I know what ones are left
 
-      console.log("starting field work..................");
+      //console.log("starting field work..................");
       var dsFields = lang.clone(dataSource.fields);
-      console.log(dsFields);
+      //console.log(dsFields);
       fieldLoop:
         for (var k in dsFields) {
           var f = dsFields[k];
@@ -152,24 +148,24 @@ define([
               f.type !== "esriFieldTypeSingle" &&
               f.type !== "esriFieldTypeDouble") {
             dsFields.splice(i, 1);
-            console.log("Removing field: " + f.name + " " + f.type);
+            //console.log("Removing field: " + f.name + " " + f.type);
           }
         }
-      console.log(dsFields);
+      //console.log(dsFields);
       var currentItems = [];
       if (this.dataSourceConfig.selectedFieldsNames) {
         for (var key in this.dataSourceConfig.selectedFieldsNames) {
           var persistField = this.dataSourceConfig.selectedFieldsNames[key];
-          console.log(persistField);
+          //console.log(persistField);
           row = table.insertRow(idx);
           row.myIndex = idx;
-          console.log("Setting persisted index: " + idx);
-          console.log(row);
+          //console.log("Setting persisted index: " + idx);
+          //console.log(row);
 
           var checked = persistField.checked;
           var displayName = persistField.displayName;
           var name = persistField.name;
-          console.log("Inserting persisted index: " + idx);
+          //console.log("Inserting persisted index: " + idx);
           currentItems.splice(idx, 0, {
             checked: checked,
             displayName: displayName,
@@ -181,21 +177,21 @@ define([
             for (var i = 0; i < dsFields.length; i++) {
               if (dsFields[i].name === name) {
                 dsFields.splice(i, 1);
-                console.log("remove: " + name);
+                //console.log("remove: " + name);
                 break configFieldLoop;
               }
             }
-          console.log("inserting row: " + row);
+          //console.log("inserting row: " + row);
           this._insertCell(row, checked, 0);
           this._insertCell(row, displayName, 1);
           this._insertCell(row, name, 2);
           this._insertCell(row, idx, 3);
-          console.log("inserted row: " + row);
+          //console.log("inserted row: " + row);
           idx += 1;
         }
       } else {
         dataSource.fields.forEach(lang.hitch(this, function (field) {
-          console.log("Setting myIndex: " + idx);
+          //console.log("Setting myIndex: " + idx);
           switch (field.type) {
             case "esriFieldTypeString":
             case "esriFieldTypeSmallInteger":
@@ -206,21 +202,21 @@ define([
               row.myIndex = idx;
               var checked = false;
               var displayName = field.alias;
-              console.log("Inserting index: " + idx);
+              //console.log("Inserting index: " + idx);
               currentItems.splice(idx, 0, {
                 checked: checked,
                 displayName: displayName,
                 name: field.name,
                 indexInTable: idx
               });
-              console.log("inserting row: " + row);
+              //console.log("inserting row: " + row);
               this._insertCell(row, checked, 0);
               this._insertCell(row, displayName, 1);
               this._insertCell(row, field.name, 2);
               this._insertCell(row, idx, 3);
-              console.log("inserted row: " + row);
+              //console.log("inserted row: " + row);
               idx += 1;
-              console.log("Incrementing index: " + idx);
+              //console.log("Incrementing index: " + idx);
               return;
           }
         }));
@@ -245,7 +241,7 @@ define([
       } else if (idx === 1) {
         domConstruct.create('input', {
           value: v,
-          style: "width: 95%",
+          className: "configTextBox",
           oninput: lang.hitch(this, function (e) {
             var row = e.srcElement.parentElement.parentElement;
             var fieldName = row.cells[2].childNodes[0].textContent;
@@ -270,7 +266,7 @@ define([
 
         domConstruct.create('div', {
           title: "Move Up",
-          className: "baseImage configUpOrder",
+          className: "configBaseOrderImage configUpOrder",
           onclick: lang.hitch(this, function (b) {
             var row = b.target.offsetParent.parentElement;
             var table = row.parentNode;
@@ -290,7 +286,7 @@ define([
 
         var l = domConstruct.create('div', {
           title: "Move Down",
-          className: "baseImage configDownOrder",
+          className: "configBaseOrderImage configDownOrder",
           onclick: lang.hitch(this, function (b) {
             var row = b.target.offsetParent.parentElement;
             var table = row.parentNode;
@@ -313,7 +309,7 @@ define([
     _insertHeaderCell: function (row, v, idx) {
       var cell = row.insertCell(idx);
       domConstruct.create('label', {
-        style: "font-weight: bold; background-color: #dcdcdc; text-align: center;",
+        className: "configHeader",
         innerHTML: v
       }, cell);
     },
@@ -334,6 +330,9 @@ define([
         name: fieldName,
         indexInTable: index
       });
+
+      console.log("Persisted Names: ");
+      console.log(persistedNames);
 
       this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0);
     },

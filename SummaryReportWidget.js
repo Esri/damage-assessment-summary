@@ -30,12 +30,12 @@ define([
   "dojo/store/Observable",
   "esri/tasks/query",
   "dgrid/OnDemandGrid",
-  "dojo/text!./DamageAssessmentSummaryWidgetTemplate.html"
+  "dojo/text!./SummaryReportWidgetTemplate.html"
 ], function (declare, lang, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, query, Observable, Query, Grid, templateString) {
 
-  return declare("DamageAssessmentSummaryWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
+  return declare("SummaryReportWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
     templateString: templateString,
-    debugName: "DamageAssessmentSummaryWidget",
+    debugName: "SummaryReportWidget",
 
 
     //TODO
@@ -74,6 +74,7 @@ define([
       for (var i = 0; i < configDetails.length; i++) {
         var f = configDetails[i];
         if (f.checked) {
+          console.log("Adding Field: " + f.name);
           this.fieldsToQuery.splice(idx, 0, f.name);
           this.configFields[f.name] = displayAlias ? f.displayName : f.name;
           idx += 1;
@@ -89,6 +90,10 @@ define([
         //this.configFields[oidName] = oidName;
       }
 
+      console.log("Setting query Fields:");
+      console.log(this.fieldsToQuery);
+      console.log("Config Fields:");
+      console.log(this.configFields);
       this.query = new Query();
       this.query.outFields = this.fieldsToQuery;
       //console.log(this.fieldsToQuery);
@@ -96,6 +101,11 @@ define([
     },
 
     _createList: function (dataSourceConfig, dataSourceProxy, mapProxy) {
+
+      console.log("Create List:");
+      console.log(this.store);
+      console.log(this.fieldsToQuery);
+      console.log(this.configFields);
       this.list = new (declare([List, Selection]))({
         mapProxy: mapProxy,
         dataProxy: dataSourceProxy,
@@ -170,8 +180,8 @@ define([
               }, contentDiv);
 
               if (idx === 0) {
-                console.log(fieldName);
-                console.log(feature.attributes[fieldName]);
+                //console.log(fieldName);
+                //console.log(feature.attributes[fieldName]);
                 title.innerHTML = feature.attributes[fieldName];
                 idx += 1;
               }
@@ -222,6 +232,9 @@ define([
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
+
+      console.error("............dataSourceExpired.............");
+
       //TODO extend this like the list example to account for feature actions??
 
       // Execute the query. A request will be sent to the server to query for the features.
@@ -235,6 +248,7 @@ define([
 
         if (featureSet.features) {
           featureSet.features.forEach(function (feature) {
+            console.error("............features.............");
             this.store.put(feature, {
               overwrite: true,
               id: feature.attributes[dataSourceProxy.objectIdFieldName]
@@ -262,6 +276,9 @@ define([
             }
             csvData += "\r\n";
             hasColumnNames = true;
+
+            console.log("Columns:");
+            console.log(csvData);
           }
 
           //populate the columns
@@ -272,7 +289,6 @@ define([
           csvData += line + "\r\n";
         });
         //fileName - for download
-        //TODO should I get like this or store at an earlier point??
         var filename = this.dataSourceProxies[0].name + ".csv";
 
         // native - open the data in excel file straight

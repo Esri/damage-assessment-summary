@@ -1,0 +1,16 @@
+{
+  "type": "Widget",
+  "title": "Summary Report Widget",
+  "description": "Review and export feature attributes to CSV.",
+  "thumbnailPath": "SummaryReport.png",
+  "useDataFromView": true,
+  "runtime": {
+    "path": "SummaryReport.html"
+  },
+  "configuration": {
+    "path": "SummaryReportConfig.html",
+    "requireDataSource": true
+  },
+  "credits": "Esri"
+}
+
