@@ -202,7 +202,7 @@ label {
 
 .configUpOrder{
   cursor: pointer;
-  background-image: url(../SummaryReport/images/up_disabled.png);
+  /*background-image: url(../SummaryReport/images/up_disabled.png);*/
 }
 
 .configUpOrder:hover{
@@ -211,7 +211,7 @@ label {
 
 .configDownOrder{
   cursor: pointer;
-  background-image: url(../SummaryReport/images/down_disabled.png);
+  /*background-image: url(../SummaryReport/images/down_disabled.png);*/
 }
 
 .configDownOrder:hover{
@@ -251,7 +251,14 @@ label {
 
 .tableTest tr:hover {
   background-color: #C5DDF7;
-    /*#518DCA*/
+}
+
+.tableTest tr:hover .defaultUp{
+  background-image: url(../SummaryReport/images/up_disabled.png);
+}
+
+.tableTest tr:hover .defaultDown{
+  background-image: url(../SummaryReport/images/down_disabled.png);
 }
 
 td {

@@ -38,6 +38,8 @@ define([
       this.inherited(arguments);
     },
 
+    //TODO get the issue fixed when you change datasource!!
+
     dataSourceSelectionChanged: function (dataSource, dataSourceConfig) {
       this.dataSourceConfig = dataSourceConfig;
 
@@ -133,12 +135,11 @@ define([
       this._insertHeaderCell(row, "Field Name", 2);
       this._insertHeaderCell(row, "Order", 3);
 
-      //I Guess I will load from the config if it's defiend
-      //and remove from this copy if it's found...so I know what ones are left
-
-      //console.log("starting field work..................");
+      //clone the datasource fields so we can compare and determine if any changes, such as...
+      //adding or removing a field, has happened since the config was saved
       var dsFields = lang.clone(dataSource.fields);
-      //console.log(dsFields);
+
+      //remove any fields that are of a type other than the list below
       fieldLoop:
         for (var k in dsFields) {
           var f = dsFields[k];
@@ -148,81 +149,77 @@ define([
               f.type !== "esriFieldTypeSingle" &&
               f.type !== "esriFieldTypeDouble") {
             dsFields.splice(i, 1);
-            //console.log("Removing field: " + f.name + " " + f.type);
           }
         }
-      //console.log(dsFields);
+
       var currentItems = [];
       if (this.dataSourceConfig.selectedFieldsNames) {
         for (var key in this.dataSourceConfig.selectedFieldsNames) {
           var persistField = this.dataSourceConfig.selectedFieldsNames[key];
-          //console.log(persistField);
+
           row = table.insertRow(idx);
           row.myIndex = idx;
-          //console.log("Setting persisted index: " + idx);
-          //console.log(row);
 
+          //TODO this approach would not handle field name changes
           var checked = persistField.checked;
           var displayName = persistField.displayName;
           var name = persistField.name;
-          //console.log("Inserting persisted index: " + idx);
-          currentItems.splice(idx, 0, {
-            checked: checked,
-            displayName: displayName,
-            name: name,
-            indexInTable: idx
-          });
 
+          var fieldExists = false;
           configFieldLoop:
             for (var i = 0; i < dsFields.length; i++) {
               if (dsFields[i].name === name) {
+                //remove the field from the datasource field list
                 dsFields.splice(i, 1);
-                //console.log("remove: " + name);
+                //add the field to the persisted list
+                if (checked) {
+                  currentItems.splice(idx, 0, {
+                    checked: checked,
+                    displayName: displayName,
+                    name: name,
+                    indexInTable: idx
+                  });
+                }
+                fieldExists = true;
                 break configFieldLoop;
               }
             }
-          //console.log("inserting row: " + row);
-          this._insertCell(row, checked, 0);
-          this._insertCell(row, displayName, 1);
-          this._insertCell(row, name, 2);
-          this._insertCell(row, idx, 3);
-          //console.log("inserted row: " + row);
-          idx += 1;
-        }
-      } else {
-        dataSource.fields.forEach(lang.hitch(this, function (field) {
-          //console.log("Setting myIndex: " + idx);
-          switch (field.type) {
-            case "esriFieldTypeString":
-            case "esriFieldTypeSmallInteger":
-            case "esriFieldTypeInteger":
-            case "esriFieldTypeSingle":
-            case "esriFieldTypeDouble":
-              row = table.insertRow(idx);
-              row.myIndex = idx;
-              var checked = false;
-              var displayName = field.alias;
-              //console.log("Inserting index: " + idx);
-              currentItems.splice(idx, 0, {
-                checked: checked,
-                displayName: displayName,
-                name: field.name,
-                indexInTable: idx
-              });
-              //console.log("inserting row: " + row);
-              this._insertCell(row, checked, 0);
-              this._insertCell(row, displayName, 1);
-              this._insertCell(row, field.name, 2);
-              this._insertCell(row, idx, 3);
-              //console.log("inserted row: " + row);
-              idx += 1;
-              //console.log("Incrementing index: " + idx);
-              return;
-          }
-        }));
-      }
 
+          if (fieldExists) {
+            this._insertCell(row, checked, 0);
+            this._insertCell(row, displayName, 1);
+            this._insertCell(row, name, 2);
+            this._insertCell(row, idx, 3);
+            idx += 1;
+          } else {
+            //TODO test to verify this...this should be the case if a config was saved then a field 
+            // was removed from the datasource
+            console.log("Field: " + name + " does not exist in the datasource");
+          }
+        }
+        //handle any remaining fields...this would be the case if a config was saved then
+        // a field was added 
+        this._addFields(table, dsFields, idx);
+      } else {
+        this._addFields(table, dsFields, idx);
+      }
       return currentItems;
+    },
+
+    _addFields: function (table, fields, idx) {
+      for (var k in fields) {
+        var f = fields[k];
+
+        row = table.insertRow(idx);
+        row.myIndex = idx;
+
+        this._insertCell(row, false, 0);
+        this._insertCell(row, f.alias, 1);
+        this._insertCell(row, f.name, 2);
+        this._insertCell(row, idx, 3);
+
+        idx += 1;
+      }
     },
 
     _insertCell: function (row, v, idx) {
@@ -266,7 +263,7 @@ define([
 
         domConstruct.create('div', {
           title: "Move Up",
-          className: "configBaseOrderImage configUpOrder",
+          className: "configBaseOrderImage defaultUp configUpOrder",
           onclick: lang.hitch(this, function (b) {
             var row = b.target.offsetParent.parentElement;
             var table = row.parentNode;
@@ -286,7 +283,7 @@ define([
 
         var l = domConstruct.create('div', {
           title: "Move Down",
-          className: "configBaseOrderImage configDownOrder",
+          className: "configBaseOrderImage defaultDown configDownOrder",
           onclick: lang.hitch(this, function (b) {
             var row = b.target.offsetParent.parentElement;
             var table = row.parentNode;
@@ -323,16 +320,14 @@ define([
           break;
         }
       }
-
-      persistedNames.splice(index, 0, {
-        checked: row.cells[0].childNodes[0].checked,
-        displayName: row.cells[1].childNodes[0].value,
-        name: fieldName,
-        indexInTable: index
-      });
-
-      console.log("Persisted Names: ");
-      console.log(persistedNames);
+      if (row.cells[0].childNodes[0].checked) {
+        persistedNames.splice(index, 0, {
+          checked: row.cells[0].childNodes[0].checked,
+          displayName: row.cells[1].childNodes[0].value,
+          name: fieldName,
+          indexInTable: index
+        });
+      }
 
       this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0);
     },
@@ -376,19 +371,3 @@ define([
     }
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

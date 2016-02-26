@@ -37,13 +37,13 @@ define([
     templateString: templateString,
     debugName: "SummaryReportWidget",
 
-
     //TODO
     // handle zoom to point...right now it just pans
-    // provide icon for row header to show open/close and highlight on hover
     // handle user entered values into the txt boxes or change them to labels
     // handle the issue that causes the row to collapse when you zoom or pan to a feature...also check this in the native app side
     // figure out how to get the style details for when the user changes themes...can't...Jay C logged a bug
+    //dataSourceExpired...look there for additional notes on this issue
+
 
     hostReady: function () {
       // Create the store we will use to display the features in the grid
@@ -53,6 +53,8 @@ define([
       // The dataSourceConfig stores the fields selected by the operation view publisher during configuration
       var dataSourceProxy = this.dataSourceProxies[0];
       var dataSourceConfig = this.getDataSourceConfig(dataSourceProxy);
+
+      this.hasData = false;
 
       this.getMapWidgetProxies().then(lang.hitch(this, function (results) {
         this._initQuery(dataSourceConfig, dataSourceProxy);
@@ -64,7 +66,6 @@ define([
       var configDetails = dataSourceConfig.selectedFieldsNames;
       var oidName = dataSourceProxy.objectIdFieldName;
       var displayAlias = dataSourceConfig.displayAlias;
-      //console.log(displayAlias);
 
       //stores actual field name
       this.fieldsToQuery = [];
@@ -87,7 +88,6 @@ define([
 
       if (this.fieldsToQuery.indexOf(oidName) === -1) {
         this.fieldsToQuery.splice(idx, 0, oidName);
-        //this.configFields[oidName] = oidName;
       }
 
       console.log("Setting query Fields:");
@@ -96,16 +96,10 @@ define([
       console.log(this.configFields);
       this.query = new Query();
       this.query.outFields = this.fieldsToQuery;
-      //console.log(this.fieldsToQuery);
       this.query.returnGeometry = true;
     },
 
     _createList: function (dataSourceConfig, dataSourceProxy, mapProxy) {
-
-      console.log("Create List:");
-      console.log(this.store);
-      console.log(this.fieldsToQuery);
-      console.log(this.configFields);
       this.list = new (declare([List, Selection]))({
         mapProxy: mapProxy,
         dataProxy: dataSourceProxy,
@@ -176,12 +170,46 @@ define([
               }, contentDiv);
               domConstruct.create('input', {
                 className: "fieldItemValue",
-                value: feature.attributes[fieldName]
+                value: feature.attributes[fieldName],
+                oninput: lang.hitch(this, function (e) {
+                  var v = e.srcElement.value;
+                  var lbl = e.srcElement.previousElementSibling;
+                  var name = lbl.textContent.substring(0, lbl.textContent.length - 1);
+
+                  //TODO these feel sloppy...
+                  var fieldName;
+                  for (var i in this.configFields) {
+                    if (this.configFields[i] === name) {
+                      fieldName = i;
+                      break;
+                    }
+                  }
+
+                  var idx;
+                  for (var k in this.selection) {
+                    idx = k;
+                    break;
+                  }
+
+                  if (typeof (this.localUpdates) === 'undefined') {
+                    this.localUpdates = {};
+                  }
+
+                  this.localUpdates[fieldName + "-_-" + idx] = v;
+
+                  //this would update the store and cause the control to re-draw...shifted to the
+                  // static localUpdatesList
+                  //var item = this.store.get(parseInt(idx));
+                  //for (var ii in item.attributes) {
+                  //  if (ii === fieldName) {
+                  //    item.attributes[ii] = v;
+                  //    this.store.put(item, {overwrite: true});
+                  //  }
+                  //}
+                })
               }, contentDiv);
 
               if (idx === 0) {
-                //console.log(fieldName);
-                //console.log(feature.attributes[fieldName]);
                 title.innerHTML = feature.attributes[fieldName];
                 idx += 1;
               }
@@ -233,61 +261,90 @@ define([
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
 
-      console.error("............dataSourceExpired.............");
+      //TODO extend this to support a compare
+      // rather than a blind update regardless
 
-      //TODO extend this like the list example to account for feature actions??
+      //TODO will still need to decide what the expectation is if a user has modified a 
+      // value in one of the txt boxes and the same value is modified on the service
+      // itself...who wins...I would think we would just want to bring over the new value 
+      // from the service
+
+      console.log("dataSourceExpired");
 
       // Execute the query. A request will be sent to the server to query for the features.
       // The results are in the featureSet
-      dataSourceProxy.executeQuery(this.query).then(function (featureSet) {
-        if (this.store.data.length > 0) {
-          this.store.query().forEach(function (item) {
-            this.store.remove(item.id);
-          }.bind(this));
-        }
 
-        if (featureSet.features) {
-          featureSet.features.forEach(function (feature) {
-            console.error("............features.............");
-            this.store.put(feature, {
-              overwrite: true,
-              id: feature.attributes[dataSourceProxy.objectIdFieldName]
-            });
-          }.bind(this));
-        }
-      }.bind(this));
+      if (!this.hasData) {
+        dataSourceProxy.executeQuery(this.query).then(function (featureSet) {
+          if (this.store.data.length > 0) {
+            this.store.query().forEach(function (item) {
+              this.store.remove(item.id);
+            }.bind(this));
+          }
+
+          if (featureSet.features) {
+            featureSet.features.forEach(function (feature) {
+              this.store.put(feature, {
+                overwrite: true,
+                id: feature.attributes[dataSourceProxy.objectIdFieldName]
+              });
+            }.bind(this));
+
+            this.hasData = true;
+          }
+        }.bind(this));
+      }
     },
 
     _exportCSV: function () {
       if (this.store.data.length > 0) {
+
+        var localUpdates = this.list.localUpdates;
+        var checkForMods = false;
+        var oid;
+        if (typeof (localUpdates) !== 'undefined') {
+          checkForMods = true;
+          oid = this.dataSourceProxies[0].objectIdFieldName;
+        }
+
         var csvData = "";
         var attributes;
         var attribute;
         var line = "";
         var hasColumnNames = false;
-        this.store.query().forEach(function (item) {
+        this.store.query().forEach(lang.hitch(this, function (item) {
           attributes = item.attributes ? item.attributes : item;
 
           // build the header
           if (!hasColumnNames) {
             for (attribute in attributes) {
-              //TODO need to filter out the OID field
-              csvData += (csvData.length === 0 ? "" : ",") + '"' + attribute + '"';
+              var configField = this.configFields[attribute];
+              if (typeof (configField) !== 'undefined') {
+                csvData += (csvData.length === 0 ? "" : ",") + '"' + configField + '"';
+              }
             }
             csvData += "\r\n";
             hasColumnNames = true;
-
-            console.log("Columns:");
-            console.log(csvData);
           }
 
           //populate the columns
           line = "";
           for (attribute in attributes) {
-            line += (line.length === 0 ? "" : ",") + '"' + attributes[attribute] + '"';
+            var configField = this.configFields[attribute];
+            if (typeof (configField) !== 'undefined') {
+              var val = attributes[attribute];
+              if (checkForMods) {
+                var checkKey = attribute + "-_-" + attributes[oid];
+                if (typeof (localUpdates[checkKey]) !== 'undefined') {
+                  val = localUpdates[checkKey];
+                }
+              }
+
+              line += (line.length === 0 ? "" : ",") + '"' + val + '"';
+            }
           }
           csvData += line + "\r\n";
-        });
+        }));
         //fileName - for download
         var filename = this.dataSourceProxies[0].name + ".csv";
 
