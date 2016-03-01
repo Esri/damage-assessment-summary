@@ -189,7 +189,7 @@ label {
 }
 
 .configRowElementContainer{
-  height: 340px; 
+  max-height: 340px; 
   margin-left: 20px;
   margin-top: 10px;
   overflow: hidden;
@@ -261,6 +261,18 @@ label {
   background-image: url(../SummaryReport/images/down_disabled.png);
 }
 
+.tableTestNotes{
+  border: 0px hidden white;
+  border-collapse: collapse;
+  height: inherit;
+  width: 50%;
+  margin-bottom: 10px;
+}
+
+.tableTestNotes tr:hover {
+  background-color: #C5DDF7;
+}
+
 td {
     border: 1px solid #dcdcdc;
 }
@@ -275,8 +287,12 @@ td {
 
 .list{
   overflow: auto;
-  height: 290px;
+  /*height: 290px;*/
   width: 100%;
+}
+
+.configList{
+  max-height: 290px;
 }
 
 .optionsCheckbox{
@@ -292,4 +308,9 @@ td {
   height: 20px; 
   width: 100%; 
   margin-bottom: 20px;
+}
+
+.configLabelDisabled{
+  background-color: rgb(235, 235, 228);
+  color: gray;
 }

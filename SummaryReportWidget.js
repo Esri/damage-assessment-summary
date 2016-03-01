@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Esri
+ * Copyright 2016 Esri
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 define([
   "dojo/_base/declare",
   "dojo/_base/lang",
+  "dojo/_base/array",
   "dojo/has",
   "dojo/dom-construct",
   "dgrid/OnDemandList",
@@ -31,7 +32,7 @@ define([
   "esri/tasks/query",
   "dgrid/OnDemandGrid",
   "dojo/text!./SummaryReportWidgetTemplate.html"
-], function (declare, lang, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, query, Observable, Query, Grid, templateString) {
+], function (declare, lang, array, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, query, Observable, Query, Grid, templateString) {
 
   return declare("SummaryReportWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
     templateString: templateString,
@@ -39,11 +40,7 @@ define([
 
     //TODO
     // handle zoom to point...right now it just pans
-    // handle user entered values into the txt boxes or change them to labels
-    // handle the issue that causes the row to collapse when you zoom or pan to a feature...also check this in the native app side
     // figure out how to get the style details for when the user changes themes...can't...Jay C logged a bug
-    //dataSourceExpired...look there for additional notes on this issue
-
 
     hostReady: function () {
       // Create the store we will use to display the features in the grid
@@ -53,8 +50,6 @@ define([
       // The dataSourceConfig stores the fields selected by the operation view publisher during configuration
       var dataSourceProxy = this.dataSourceProxies[0];
       var dataSourceConfig = this.getDataSourceConfig(dataSourceProxy);
-
-      this.hasData = false;
 
       this.getMapWidgetProxies().then(lang.hitch(this, function (results) {
         this._initQuery(dataSourceConfig, dataSourceProxy);
@@ -75,7 +70,6 @@ define([
       for (var i = 0; i < configDetails.length; i++) {
         var f = configDetails[i];
         if (f.checked) {
-          console.log("Adding Field: " + f.name);
           this.fieldsToQuery.splice(idx, 0, f.name);
           this.configFields[f.name] = displayAlias ? f.displayName : f.name;
           idx += 1;
@@ -90,10 +84,6 @@ define([
         this.fieldsToQuery.splice(idx, 0, oidName);
       }
 
-      console.log("Setting query Fields:");
-      console.log(this.fieldsToQuery);
-      console.log("Config Fields:");
-      console.log(this.configFields);
       this.query = new Query();
       this.query.outFields = this.fieldsToQuery;
       this.query.returnGeometry = true;
@@ -106,9 +96,18 @@ define([
         store: this.store,
         fields: this.fieldsToQuery,
         configFields: this.configFields,
+        noteFields: dataSourceConfig.noteFields,
+        rowState: {},
         cleanEmptyObservers: false,
         selectionMode: this.isNative ? "extended" : "toggle",
         renderRow: function (feature) {
+          var isOpen = false;
+          if (typeof (this.rowState) !== 'undefined') {
+            if (typeof(this.rowState[feature.id]) !== 'undefined') {
+              isOpen = this.rowState[feature.id];
+            }
+          }
+
           var divNode = domConstruct.create('div', {
             className: "bottomBorder"
           });
@@ -154,9 +153,17 @@ define([
           }, titleDiv);
 
           var contentDiv = domConstruct.create('div', {
-            className: "rowOff",
+            className: isOpen ? "rowOn" : "rowOff",
             id: feature.id
           }, divNode);
+
+          if (isOpen) {
+            var img = contentDiv.parentElement.childNodes[0].childNodes[0];
+            domClass.remove(img, "downImage");
+            domClass.add(img, "upImage");
+            domClass.remove(img, "image-down-highlight");
+            domClass.add(img, "image-up-highlight");
+          }
 
           var idx = 0;
           for (var i = 0; i < this.fields.length; i++) {
@@ -176,7 +183,6 @@ define([
                   var lbl = e.srcElement.previousElementSibling;
                   var name = lbl.textContent.substring(0, lbl.textContent.length - 1);
 
-                  //TODO these feel sloppy...
                   var fieldName;
                   for (var i in this.configFields) {
                     if (this.configFields[i] === name) {
@@ -184,6 +190,43 @@ define([
                       break;
                     }
                   }
+
+                  if (typeof (this.localUpdates) === 'undefined') {
+                    this.localUpdates = {};
+                  }
+
+                  this.localUpdates[fieldName + "-_-" + feature.id] = v;
+                })
+              }, contentDiv);
+
+              if (idx === 0) {
+                title.innerHTML = feature.attributes[fieldName];
+                idx += 1;
+              }
+            }
+          }
+
+          if (this.noteFields && this.noteFields.length > 0) {
+            for (var i = 0; i < this.noteFields.length; i++) {
+              var fieldName = this.noteFields[i];
+
+              domConstruct.create('label', {
+                className: "fieldItemLabel",
+                innerHTML: fieldName + ":"
+              }, contentDiv);
+
+              var val = ""
+              if (this.localUpdates) {
+                val = this.localUpdates[fieldName + "-_-" + feature.id];
+              }
+              
+              domConstruct.create('input', {
+                className: "fieldItemValue",
+                value: val,
+                oninput: lang.hitch(this, function (e) {
+                  var v = e.srcElement.value;
+                  var lbl = e.srcElement.previousElementSibling;
+                  var name = lbl.textContent.substring(0, lbl.textContent.length - 1);
 
                   var idx;
                   for (var k in this.selection) {
@@ -195,24 +238,10 @@ define([
                     this.localUpdates = {};
                   }
 
-                  this.localUpdates[fieldName + "-_-" + idx] = v;
+                  this.localUpdates[name + "-_-" + idx] = v;
 
-                  //this would update the store and cause the control to re-draw...shifted to the
-                  // static localUpdatesList
-                  //var item = this.store.get(parseInt(idx));
-                  //for (var ii in item.attributes) {
-                  //  if (ii === fieldName) {
-                  //    item.attributes[ii] = v;
-                  //    this.store.put(item, {overwrite: true});
-                  //  }
-                  //}
                 })
               }, contentDiv);
-
-              if (idx === 0) {
-                title.innerHTML = feature.attributes[fieldName];
-                idx += 1;
-              }
             }
           }
 
@@ -247,7 +276,7 @@ define([
               innerHTML: "Select Feature",
               onclick: lang.hitch(this, function (evt) {
                 var row = evt.target.parentElement.parentElement.parentElement;
-                this.dataProxy.selectFeatures(row.id);
+                this.dataProxy.selectFeaturesByObjectIds([row.id]);
               })
             }, btnContainer);
           }
@@ -260,40 +289,32 @@ define([
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
-
-      //TODO extend this to support a compare
-      // rather than a blind update regardless
-
-      //TODO will still need to decide what the expectation is if a user has modified a 
-      // value in one of the txt boxes and the same value is modified on the service
-      // itself...who wins...I would think we would just want to bring over the new value 
-      // from the service
-
-      console.log("dataSourceExpired");
-
       // Execute the query. A request will be sent to the server to query for the features.
       // The results are in the featureSet
 
-      if (!this.hasData) {
-        dataSourceProxy.executeQuery(this.query).then(function (featureSet) {
-          if (this.store.data.length > 0) {
-            this.store.query().forEach(function (item) {
-              this.store.remove(item.id);
-            }.bind(this));
-          }
+      //I had also looked at testing the current feature data and the new feature data to evaluate
+      //if an update had occured...however, the "before" option seemed to work inconsistantly
+      //or I was in some way not managing the store correctly...switching back to this wipe and re-create approach for now
+      dataSourceProxy.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
+        if (this.store.data.length > 0) {
+          this.store.query().forEach(lang.hitch(this, function (item) {
+            if (this.list.row(item.id).element) {
+              var rowElementNode = this.list.row(item.id).element.childNodes[1];
+              this.list.rowState[item.id] = domClass.contains(rowElementNode, "rowOn");
+            }
+            this.store.remove(item.id);
+          }.bind(this)));
+        }
 
-          if (featureSet.features) {
-            featureSet.features.forEach(function (feature) {
-              this.store.put(feature, {
-                overwrite: true,
-                id: feature.attributes[dataSourceProxy.objectIdFieldName]
-              });
-            }.bind(this));
-
-            this.hasData = true;
-          }
-        }.bind(this));
-      }
+        if (featureSet.features) {
+          for (var j = 0; j < featureSet.features.length; j++) {
+            var feature = featureSet.features[j];
+            this.store.put(feature, {
+              id: parseInt(feature.attributes[dataSourceProxy.objectIdFieldName])
+            });
+          };
+        }
+      }.bind(this)));
     },
 
     _exportCSV: function () {
@@ -315,6 +336,9 @@ define([
         this.store.query().forEach(lang.hitch(this, function (item) {
           attributes = item.attributes ? item.attributes : item;
 
+          var dataSourceProxy = this.dataSourceProxies[0];
+          var dataSourceConfig = this.getDataSourceConfig(dataSourceProxy);
+
           // build the header
           if (!hasColumnNames) {
             for (attribute in attributes) {
@@ -323,6 +347,14 @@ define([
                 csvData += (csvData.length === 0 ? "" : ",") + '"' + configField + '"';
               }
             }
+
+            if (dataSourceConfig.noteFields && dataSourceConfig.noteFields.length) {
+              for (var i = 0; i < dataSourceConfig.noteFields.length; i++) {
+                var noteField = dataSourceConfig.noteFields[i];
+                csvData += (csvData.length === 0 ? "" : ",") + '"' + noteField + '"';
+              }
+            }
+
             csvData += "\r\n";
             hasColumnNames = true;
           }
@@ -343,6 +375,16 @@ define([
               line += (line.length === 0 ? "" : ",") + '"' + val + '"';
             }
           }
+
+          for (var jj = 0; jj < dataSourceConfig.noteFields.length; jj++) {
+            var f = dataSourceConfig.noteFields[jj];
+            var checkKey = f + "-_-" + attributes[oid];
+            if (typeof (localUpdates[checkKey]) !== 'undefined') {
+              val = localUpdates[checkKey];
+              line += (line.length === 0 ? "" : ",") + '"' + val + '"';
+            }
+          }
+
           csvData += line + "\r\n";
         }));
         //fileName - for download

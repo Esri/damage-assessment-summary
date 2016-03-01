@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Esri
+ * Copyright 2016 Esri
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,19 +38,21 @@ define([
       this.inherited(arguments);
     },
 
-    //TODO get the issue fixed when you change datasource!!
-
     dataSourceSelectionChanged: function (dataSource, dataSourceConfig) {
+      if (this.dataSourceConfig && this.dataSourceConfig.dataSourceId !== dataSourceConfig.dataSourceId) {
+        this.configListDiv.innerHTML = "";
+        this.configListDivOptions.innerHTML = "";
+      }
+
       this.dataSourceConfig = dataSourceConfig;
 
-      //TODO need to understand when and what all happens to the config when a datasource changes
-      // also need to understand when it's ok to check the config values
+      //setup fields config UI
       this._createTableOptions(dataSourceConfig.displayAll, dataSourceConfig.displayAlias);
       this.dataSourceConfig.selectedFieldsNames = this._createSimpleTable(dataSource);
-
-      console.log("Selected Names: ");
-      console.log(this.dataSourceConfig.selectedFieldsNames);
       this._initTextBoxes(this.configListDiv.childNodes[0].rows, this.dataSourceConfig.displayAlias); 
+
+      //setup note fields config UI
+      this._createNoteFields(dataSourceConfig);
     },
 
     _createTableOptions: function (displayAll, displayAlias) {
@@ -113,6 +115,14 @@ define([
       for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         row.cells[1].childNodes[0].disabled = !v;
+        var opCell = row.cells[2].childNodes[0];
+        if (v && !domClass.contains(opCell, "configLabelDisabled")) {
+          if (!domClass.contains(opCell, "configHeader")) {
+            domClass.add(opCell, "configLabelDisabled");
+          }
+        } else {
+          domClass.remove(opCell, "configLabelDisabled");
+        }  
       }
     },
 
@@ -213,8 +223,13 @@ define([
         row = table.insertRow(idx);
         row.myIndex = idx;
 
+        var alias = f.alias;
+        if (alias === "" || alias === null || typeof (alias) === 'undefined') {
+          alias = f.name;
+        }
+
         this._insertCell(row, false, 0);
-        this._insertCell(row, f.alias, 1);
+        this._insertCell(row, alias, 1);
         this._insertCell(row, f.name, 2);
         this._insertCell(row, idx, 3);
 
@@ -250,13 +265,6 @@ define([
           innerHTML: v
         }, cell);
       } else if (idx === 3) {
-        //TODO need up image, down image, and up/down image
-        // set down only image for the first row and up only image for the last row and
-        // up/down for the rest
-        if (v === 0) {
-          //set down only image on hover
-        } 
-
         var l = domConstruct.create('div', {
           className: "configOrderContainer"
         }, cell);
@@ -367,6 +375,80 @@ define([
         domClass.add(img, "downImage");
         domClass.remove(img, "image-up-highlight");
         domClass.add(img, "image-down-highlight");
+      }
+    },
+
+    _createNoteFields: function (dataSourceConfig) {
+      if (typeof (dataSourceConfig.noteFields) === 'undefined') {
+        this.noteFields = [];
+        dataSourceConfig.noteFields = [];
+      } else {
+        this.noteFields = dataSourceConfig.noteFields;
+      }
+      this.noteFields.push("Note Field Name");
+
+      var table1 = domConstruct.create('table', {
+        className: "tableTestNotes"
+      }, this.configNotesListDiv);
+
+      var table = domConstruct.create('tbody', {
+        className: "tableTestNotes"
+      }, table1);
+
+      console.log(this.noteFields.length);
+      for (var i = 0; i < this.noteFields.length; i++) {
+        var row = table.insertRow(i);
+        this._insertNoteFieldCell(row, this.noteFields[i], 0);
+        this._insertNoteFieldCell(row, this.noteFields[i] !== "Note Field Name", 1);
+        this._insertNoteFieldCell(row, "Remove", 2);
+      }
+    },
+
+    _insertNoteFieldCell: function (row, v, idx) {
+      var cell = row.insertCell(idx);
+      if (idx === 0) {
+        domConstruct.create('input', {
+          value: v,
+          className: "configTextBox",
+          onclick: function (e) {
+            this.select();
+          },
+          oninput: lang.hitch(this, function (e) {
+            var row = e.srcElement.parentElement.parentElement;
+            var noteFieldName = row.cells[0].childNodes[0].value;
+
+            //persist with the config
+            this.dataSourceConfig.noteFields[row.sectionRowIndex] = noteFieldName;
+            //enable the remove checkbox
+            row.cells[1].childNodes[0].disabled = false;
+            this.readyToPersistConfig(this.dataSourceConfig.noteFields.length > 0);
+            if (row.sectionRowIndex === row.offsetParent.rows.length - 1) {
+              //add a new Note Field placeholder
+              var newRow = row.offsetParent.insertRow(row.offsetParent.rows.length);
+
+              this._insertNoteFieldCell(newRow, "Note Field Name", 0);
+              this._insertNoteFieldCell(newRow, false, 1);
+              this._insertNoteFieldCell(newRow, "Remove", 2);
+            }
+          })
+        }, cell);
+      } else if (idx === 1) {
+        domConstruct.create('input', {
+          type: "checkbox",
+          checked: false,
+          disabled: !v,
+          onclick: lang.hitch(this, function (b) {
+            var row = b.target.parentElement.parentElement;
+            var table = row.offsetParent;
+            this.dataSourceConfig.noteFields.splice(row.sectionRowIndex, 1);
+            table.deleteRow(row.sectionRowIndex);
+            this.readyToPersistConfig(this.dataSourceConfig.noteFields.length > 0);
+          })
+        }, cell);
+      } else if (idx === 2) {
+        var l = domConstruct.create('label', {
+          innerHTML: v
+        }, cell);
       }
     }
   });
