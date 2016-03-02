@@ -34,7 +34,6 @@ label {
   cursor:pointer;
   min-width: 70px;
   display:inline-block;
-  /*padding:0 15px;*/
   line-height: 33px;
   font-size:14px;
   text-align:center;
@@ -46,7 +45,6 @@ label {
   border-radius: 5px;
   border: 1px solid transparent;
   overflow: hidden;
-  /*text-overflow: ellipsis;*/
   white-space: nowrap;
 }
 
@@ -84,6 +82,7 @@ label {
 .fieldItemLabel{
   position: relative;
   margin-top: 5px;
+  margin-left: 5px;
 }
 
 .fieldItemValue{
@@ -235,59 +234,42 @@ label {
   margin-bottom: 10px;
 }
 
-.test{
-  width: 90%;
-  height: 30px;
-  border: 1px solid black;
-  overflow-x: hidden;
-}
-
-.tableTest{
+.fieldTable{
   border: 1px solid #dcdcdc;
-  /*border-collapse: collapse;*/
   height: inherit;
   width: 90%;
 }
 
-.tableTest tr:hover {
+.fieldTable tr:hover {
   background-color: #C5DDF7;
 }
 
-.tableTest tr:hover .defaultUp{
+.fieldTable tr:hover .defaultUp{
   background-image: url(../SummaryReport/images/up_disabled.png);
 }
 
-.tableTest tr:hover .defaultDown{
+.fieldTable tr:hover .defaultDown{
   background-image: url(../SummaryReport/images/down_disabled.png);
 }
 
-.tableTestNotes{
-  border: 0px hidden white;
+.noteFieldTable{
+  border: 1px solid #dcdcdc;
   border-collapse: collapse;
   height: inherit;
   width: 50%;
   margin-bottom: 10px;
 }
 
-.tableTestNotes tr:hover {
+.noteFieldTable tr:hover {
   background-color: #C5DDF7;
 }
 
 td {
-    border: 1px solid #dcdcdc;
-}
-
-.tableTest2{
-  padding: 5px;
-}
-
-.t{
-  width: 90%;
+  border: 1px solid #dcdcdc;
 }
 
 .list{
   overflow: auto;
-  /*height: 290px;*/
   width: 100%;
 }
 

@@ -30,17 +30,14 @@ define([
   "dojo/query",
   "dojo/store/Observable",
   "esri/tasks/query",
+  "esri/geometry/geometryEngine",
   "dgrid/OnDemandGrid",
   "dojo/text!./SummaryReportWidgetTemplate.html"
-], function (declare, lang, array, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, query, Observable, Query, Grid, templateString) {
+], function (declare, lang, array, has, domConstruct, List, Selection, _WidgetBase, _TemplatedMixin, Button, domClass, WidgetProxy, Extent, Memory, query, Observable, Query, geometryEngine, Grid, templateString) {
 
   return declare("SummaryReportWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
     templateString: templateString,
     debugName: "SummaryReportWidget",
-
-    //TODO
-    // handle zoom to point...right now it just pans
-    // figure out how to get the style details for when the user changes themes...can't...Jay C logged a bug
 
     hostReady: function () {
       // Create the store we will use to display the features in the grid
@@ -262,10 +259,10 @@ define([
               if (rowData) {
                 var geom = rowData.geometry;
                 if (geom.type === "point") {
-                  this.mapProxy.panTo(geom);
-                } else {
-                  this.mapProxy.setExtent(geom);
+                  var res = geometryEngine.buffer([geom], 1, 9035, false);
+                  geom = res[0];
                 }
+                this.mapProxy.setExtent(geom.getExtent());
               }
             })
           }, btnContainer);

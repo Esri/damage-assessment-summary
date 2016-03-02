@@ -39,12 +39,23 @@ define([
     },
 
     dataSourceSelectionChanged: function (dataSource, dataSourceConfig) {
-      if (this.dataSourceConfig && this.dataSourceConfig.dataSourceId !== dataSourceConfig.dataSourceId) {
+      if (dataSourceConfig && dataSourceConfig.dataSourceId !== dataSourceConfig.dataSourceId) {
         this.configListDiv.innerHTML = "";
         this.configListDivOptions.innerHTML = "";
+        this.configNotesListDiv.innerHTML = "";
+        dataSourceConfig.displayAll = false;
+        dataSourceConfig.displayAlias = true;
       }
 
       this.dataSourceConfig = dataSourceConfig;
+
+      if (typeof (this.dataSourceConfig.displayAll) !== 'undefined') {
+        this.initialDisplayAll = this.dataSourceConfig.displayAll;
+      }
+
+      if (typeof (this.dataSourceConfig.displayAlias) !== 'undefined') {
+        this.initialDisplayAlias = this.dataSourceConfig.displayAlias;
+      }
 
       //setup fields config UI
       this._createTableOptions(dataSourceConfig.displayAll, dataSourceConfig.displayAlias);
@@ -80,7 +91,8 @@ define([
               cbCell.childNodes[0].click();
             }
           }
-          this.readyToPersistConfig(true);
+          var persistedNames = this.dataSourceConfig.selectedFieldsNames;
+          this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0 && this.initialDisplayAll !== this.dataSourceConfig.displayAll);
         })
       }, this.configListDivOptions);
 
@@ -100,7 +112,8 @@ define([
           this.dataSourceConfig.displayAlias = v.target.checked;
           var rows = this.configListDiv.childNodes[0].rows;
           this._initTextBoxes(rows, v.target.checked);
-          this.readyToPersistConfig(true);
+          var persistedNames = this.dataSourceConfig.selectedFieldsNames;
+          this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0 && this.initialDisplayAlias !== this.dataSourceConfig.displayAlias);
         })
       }, this.configListDivOptions);
 
@@ -128,11 +141,11 @@ define([
 
     _createSimpleTable: function (dataSource) {
       var table1 = domConstruct.create('table', {
-        className: "tableTest"
+        className: "fieldTable"
       }, this.configListDiv);
 
       var table = domConstruct.create('tbody', {
-        className: "tableTest"
+        className: "fieldTable"
       }, table1);
 
       var idx = 0;
@@ -170,7 +183,6 @@ define([
           row = table.insertRow(idx);
           row.myIndex = idx;
 
-          //TODO this approach would not handle field name changes
           var checked = persistField.checked;
           var displayName = persistField.displayName;
           var name = persistField.name;
@@ -202,13 +214,9 @@ define([
             this._insertCell(row, idx, 3);
             idx += 1;
           } else {
-            //TODO test to verify this...this should be the case if a config was saved then a field 
-            // was removed from the datasource
             console.log("Field: " + name + " does not exist in the datasource");
           }
         }
-        //handle any remaining fields...this would be the case if a config was saved then
-        // a field was added 
         this._addFields(table, dsFields, idx);
       } else {
         this._addFields(table, dsFields, idx);
@@ -336,17 +344,7 @@ define([
           indexInTable: index
         });
       }
-
       this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0);
-    },
-
-    onSelectionChanged: function (value) {
-      //TODO this is out of sync and needs to be updated
-      if (!this.dataSourceConfig)
-        return;
-
-      this.dataSourceConfig.selectedFieldsNames = value;
-      this.readyToPersistConfig(Array.isArray(value) && value.length > 0);
     },
 
     rowClicked: function (evt) {
@@ -380,6 +378,7 @@ define([
 
     _createNoteFields: function (dataSourceConfig) {
       if (typeof (dataSourceConfig.noteFields) === 'undefined') {
+
         this.noteFields = [];
         dataSourceConfig.noteFields = [];
       } else {
@@ -388,14 +387,13 @@ define([
       this.noteFields.push("Note Field Name");
 
       var table1 = domConstruct.create('table', {
-        className: "tableTestNotes"
+        className: "noteFieldTable"
       }, this.configNotesListDiv);
 
       var table = domConstruct.create('tbody', {
-        className: "tableTestNotes"
+        className: "noteFieldTable"
       }, table1);
 
-      console.log(this.noteFields.length);
       for (var i = 0; i < this.noteFields.length; i++) {
         var row = table.insertRow(i);
         this._insertNoteFieldCell(row, this.noteFields[i], 0);
@@ -407,13 +405,14 @@ define([
     _insertNoteFieldCell: function (row, v, idx) {
       var cell = row.insertCell(idx);
       if (idx === 0) {
-        domConstruct.create('input', {
+        var input = domConstruct.create('input', {
           value: v,
           className: "configTextBox",
           onclick: function (e) {
             this.select();
           },
           oninput: lang.hitch(this, function (e) {
+            html.setStyle(e.srcElement, "font-style", "initial");
             var row = e.srcElement.parentElement.parentElement;
             var noteFieldName = row.cells[0].childNodes[0].value;
 
@@ -432,6 +431,7 @@ define([
             }
           })
         }, cell);
+        html.setStyle(input, "font-style", "italic");
       } else if (idx === 1) {
         domConstruct.create('input', {
           type: "checkbox",
