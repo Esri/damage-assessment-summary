@@ -128,11 +128,11 @@ label {
 }
 
 .upImage{
-  background-image: url(../SummaryReport/images/default_nav_up.png);
+  background-image: url(../damage-assessment-summary/images/default_nav_up.png);
 }
 
 .downImage{
-  background-image: url(../SummaryReport/images/default_nav_down.png);
+  background-image: url(../damage-assessment-summary/images/default_nav_down.png);
 }
 
 .titleDiv {
@@ -152,12 +152,12 @@ label {
 }
 
 .titleDiv:hover .image-up-highlight{
-  background-image: url(../SummaryReport/images/nav_up.png);
+  background-image: url(../damage-assessment-summary/images/nav_up.png);
   background-color: #083F77;
 }
 
 .titleDiv:hover .image-down-highlight{
-  background-image: url(../SummaryReport/images/nav_down.png);
+  background-image: url(../damage-assessment-summary/images/nav_down.png);
   background-color: #083F77;
 }
 
@@ -173,12 +173,12 @@ label {
 }
 
 .configRowHeader:hover .image-up-highlight{
-  background-image: url(../SummaryReport/images/nav_up.png);
+  background-image: url(../damage-assessment-summary/images/nav_up.png);
   background-color: #083F77;
 }
 
 .configRowHeader:hover .image-down-highlight{
-  background-image: url(../SummaryReport/images/nav_down.png);
+  background-image: url(../damage-assessment-summary/images/nav_down.png);
   background-color: #083F77;
 }
 
@@ -205,7 +205,7 @@ label {
 }
 
 .configUpOrder:hover{
-  background-image: url(../SummaryReport/images/up_hover.png);
+  background-image: url(../damage-assessment-summary/images/up_hover.png);
 }
 
 .configDownOrder{
@@ -214,7 +214,7 @@ label {
 }
 
 .configDownOrder:hover{
-  background-image: url(../SummaryReport/images/down_hover.png);
+  background-image: url(../damage-assessment-summary/images/down_hover.png);
 }
 
 .configHeader{
@@ -245,11 +245,11 @@ label {
 }
 
 .fieldTable tr:hover .defaultUp{
-  background-image: url(../SummaryReport/images/up_disabled.png);
+  background-image: url(../damage-assessment-summary/images/up_disabled.png);
 }
 
 .fieldTable tr:hover .defaultDown{
-  background-image: url(../SummaryReport/images/down_disabled.png);
+  background-image: url(../damage-assessment-summary/images/down_disabled.png);
 }
 
 .noteFieldTable{

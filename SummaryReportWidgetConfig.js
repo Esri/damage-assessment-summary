@@ -92,7 +92,7 @@ define([
             }
           }
           var persistedNames = this.dataSourceConfig.selectedFieldsNames;
-          this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0 && this.initialDisplayAll !== this.dataSourceConfig.displayAll);
+          this.readyToPersistConfig(v.target.checked || this.dataSourceConfig.noteFields.length > 0);
         })
       }, this.configListDivOptions);
 
@@ -113,7 +113,7 @@ define([
           var rows = this.configListDiv.childNodes[0].rows;
           this._initTextBoxes(rows, v.target.checked);
           var persistedNames = this.dataSourceConfig.selectedFieldsNames;
-          this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0 && this.initialDisplayAlias !== this.dataSourceConfig.displayAlias);
+          this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0 || this.dataSourceConfig.noteFields.length > 0);
         })
       }, this.configListDivOptions);
 
@@ -344,7 +344,7 @@ define([
           indexInTable: index
         });
       }
-      this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0);
+      this.readyToPersistConfig(Array.isArray(persistedNames) && persistedNames.length > 0 || this.dataSourceConfig.noteFields.length > 0);
     },
 
     rowClicked: function (evt) {
@@ -420,7 +420,7 @@ define([
             this.dataSourceConfig.noteFields[row.sectionRowIndex] = noteFieldName;
             //enable the remove checkbox
             row.cells[1].childNodes[0].disabled = false;
-            this.readyToPersistConfig(this.dataSourceConfig.noteFields.length > 0);
+            this.readyToPersistConfig(true);
             if (row.sectionRowIndex === row.offsetParent.rows.length - 1) {
               //add a new Note Field placeholder
               var newRow = row.offsetParent.insertRow(row.offsetParent.rows.length);
@@ -442,7 +442,7 @@ define([
             var table = row.offsetParent;
             this.dataSourceConfig.noteFields.splice(row.sectionRowIndex, 1);
             table.deleteRow(row.sectionRowIndex);
-            this.readyToPersistConfig(this.dataSourceConfig.noteFields.length > 0);
+            this.readyToPersistConfig(this.dataSourceConfig.noteFields.length > 0 || this.dataSourceConfig.selectedFieldsNames.length > 0);
           })
         }, cell);
       } else if (idx === 2) {
