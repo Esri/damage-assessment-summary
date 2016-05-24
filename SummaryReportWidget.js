@@ -165,6 +165,13 @@ define([
           var idx = 0;
           for (var i = 0; i < this.fields.length; i++) {
             var fieldName = this.fields[i];
+            var v = "";
+            var id = fieldName + "-_-" + feature.id;
+            if (this.localUpdates && this.localUpdates.hasOwnProperty(id)) {
+              v = this.localUpdates[id];
+            } else {
+              v = feature.attributes[fieldName];
+            }
             //do this so we can have the OID in the query to support selection
             // but avoid drawing in the widget
             if (typeof (this.configFields[fieldName]) !== 'undefined') {
@@ -174,7 +181,7 @@ define([
               }, contentDiv);
               domConstruct.create('input', {
                 className: "fieldItemValue",
-                value: feature.attributes[fieldName],
+                value: v,
                 oninput: lang.hitch(this, function (e) {
                   var v = e.srcElement.value;
                   var lbl = e.srcElement.previousElementSibling;
