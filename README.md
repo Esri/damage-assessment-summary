@@ -1,9 +1,12 @@
 damage-assessment-summary
 =========================
+***This damage-assessment-summary repo been moved to mature support, applications built from this repo are in mature support.***
+
+***Check out the new [Damage Assessment Dashboard](http://solutions.arcgis.com/emergency-management/help/damage-assessment) solution.***
 
 The Damage Assessment Summary Add-in extends the Operations Dashboard for ArcGIS application and allows you to generate a damage summary
 
-[![Image of Damage Assessment Summary Add-in](damage-assessment-summary.png "Damage Assessment Summary")](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment)
+[![Image of Damage Assessment Summary Add-in](damage-assessment-summary.png "Damage Assessment Summary")]
 
 ## Features
 
@@ -21,14 +24,9 @@ Alternatively, build the project, and upload the .opdashboardaddin file from the
 
 ## Resources
 
-Learn more about Esri's [Emergency Management Solutions](http://solutions.arcgis.com/local-government/"ArcGIS for Local Government maps and apps)
-
-Show me a list of other [State Government GitHub repositories](http://esri.github.io/#State-Government).
+Learn more about Esri's [Emergency Management Solutions](http://solutions.arcgis.com/emergency-management/"ArcGIS for Emergency Management maps and apps)
 
 Show me a list of other [Emergency Management GitHub repositories](http://esri.github.io/#Emergency-Management).
-
-Additional [information and sample data](http://links.esri.com/emergencymanagement/help/10.2/DamageAssessment)
-are available for the application.
 
 Learn more about Esri's [Operations Dashboard for ArcGIS](http://www.esri.com/software/arcgis/arcgisonline/features/operations-dashboard).
 
@@ -63,6 +61,3 @@ limitations under the License.
 
 A copy of the license is available in the repository's
 [LICENSE.txt](LICENSE.txt) file.
-
-[](Esri Tags: ArcGISSolutions State-Government Local-Government Emergency-Management Damage Assessment Summary)
-[](Esri Language: C#)
