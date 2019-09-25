@@ -1,6 +1,6 @@
 damage-assessment-summary
 =========================
-***This damage-assessment-summary repo been moved to mature support, applications built from this repo are in mature support.***
+***This damage-assessment-summary repo been moved to mature support, applications built from this repo are retired and no longer support.***
 
 ***Check out the new [Damage Assessment Dashboard](http://solutions.arcgis.com/emergency-management/help/damage-assessment) solution.***
 
